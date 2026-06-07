@@ -1,0 +1,18 @@
+services:
+  plc:
+    container_name: plc
+    image: cloudwithrk/plc:latest 
+    ports:
+      - "80:3000" 
+    restart: unless-stopped 
+    environment:
+      NODE_ENV: production
+
+  backend:
+    container_name: plc-backend
+    image: cloudwithrk/plc-backend:latest
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    env_file: 
+      - .env

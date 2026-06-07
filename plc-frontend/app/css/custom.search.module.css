@@ -1,0 +1,188 @@
+/* =================================
+   HERO
+================================= */
+html,
+body{
+    margin:0;
+    padding:0;
+    overflow-x:hidden;
+}
+.rkHeroSection{
+    position:relative;
+    width:100%;
+    min-height:560px;
+    margin-top:126px;
+    overflow:hidden;
+}
+
+.rkHeroOverlay{
+    position:absolute;
+    inset:0;
+
+    background-image:url("/assets/engineering-services-1.jpg");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+}
+
+.rkHeroOverlay::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0,0,0,.75) 0%,
+            rgba(0,0,0,.45) 45%,
+            rgba(0,0,0,.15) 100%
+        );
+}
+
+/* =================================
+   CONTAINER
+================================= */
+
+.rkHeroContainer{
+    position:relative;
+    z-index:2;
+
+    width:100%;
+    max-width:1280px;
+
+    margin:0 auto;
+    padding:0 72px;
+
+    min-height:560px;
+
+    display:flex;
+    align-items:center;
+}
+
+/* =================================
+   CONTENT
+================================= */
+
+.rkHeroContent{
+    max-width:420px;
+}
+
+.rkHeroTitle{
+    color:#fff;
+
+    font-size:3rem;
+    line-height:1.1;
+    font-weight:700;
+
+    margin-bottom:28px;
+}
+
+/* =================================
+   SEARCH
+================================= */
+
+.rkHeroSearch{
+    position:relative;
+    width:100%;
+}
+
+.rkHeroInput{
+    width:100%;
+    height:46px;
+
+    border:none;
+    outline:none;
+
+    background:#fff;
+    border: 1px solid var(--blue);
+
+    border-radius:999px;
+
+    padding:0 70px 0 22px;
+
+    font-size:1rem;
+}
+
+.rkHeroButton{
+    position:absolute;
+
+    right:8px;
+    top:50%;
+
+    transform:translateY(-50%);
+
+    width:36px;
+    height:36px;
+
+    border:none;
+    border-radius:50%;
+
+    background: var(--blue);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#fff;
+    cursor:pointer;
+}
+
+
+@media (max-width:768px){
+
+    .rkHeroSection{
+        min-height:500px;
+        margin-top:95px;
+    }
+
+    .rkHeroContainer{
+        padding:0 24px;
+        min-height:500px;
+    }
+
+    .rkHeroContent{
+        max-width:320px;
+    }
+
+    .rkHeroTitle{
+        font-size:2.2rem;
+        line-height:1.15;
+        margin-bottom:20px;
+    }
+}
+
+@media (max-width:480px){
+
+    .rkHeroSection{
+        min-height:420px;
+        margin-top:80px;
+    }
+
+    .rkHeroContainer{
+        padding:0 18px;
+        min-height:420px;
+    }
+
+    .rkHeroContent{
+        width:100%;
+        max-width:260px; /* title width control */
+    }
+
+    .rkHeroTitle{
+        font-size:1.9rem; /* smaller title */
+        line-height:1.1;
+        margin-bottom:18px;
+        max-width:260px;
+    }
+
+    .rkHeroInput{
+        height:48px;
+        font-size:.9rem;
+        padding:0 58px 0 16px;
+    }
+
+    .rkHeroButton{
+        width:38px;
+        height:38px;
+    }
+}

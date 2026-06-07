@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" role="img" aria-labelledby="title desc">
+  <title id="title">PLC Automation Logo</title>
+  <desc id="desc">PLC Automation corporate logo with icon and slogan.</desc>
+  <rect width="1200" height="320" fill="transparent" />
+  <g transform="translate(24,20)">
+    <polygon
+      points="120,0 224,60 224,180 120,240 16,180 16,60"
+      fill="#1084cf"
+    />
+    <path d="M60 60c-28 20-40 46-40 60s12 40 40 60c-18-25-26-42-26-60s8-35 26-60z" fill="#ffffff" />
+    <ellipse cx="120" cy="120" rx="36" ry="74" fill="#ffffff" />
+    <ellipse cx="120" cy="120" rx="20" ry="44" fill="#1084cf" />
+    <ellipse cx="156" cy="120" rx="28" ry="62" fill="#ffffff" />
+    <ellipse cx="156" cy="120" rx="14" ry="34" fill="#1084cf" />
+    <ellipse cx="190" cy="120" rx="8" ry="24" fill="#ffffff" />
+  </g>
+  <g transform="translate(280,84)" fill="#007dd4">
+    <text
+      x="0"
+      y="60"
+      font-family="Arial, Helvetica, sans-serif"
+      font-size="96"
+      font-weight="700"
+      letter-spacing="1"
+    >
+      PLC AUTOMATION
+    </text>
+    <text
+      x="0"
+      y="136"
+      font-family="Arial, Helvetica, sans-serif"
+      font-size="64"
+      font-weight="500"
+      letter-spacing="1"
+    >
+      WE PROVIDE YOU SOLUTION
+    </text>
+  </g>
+</svg>

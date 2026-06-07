@@ -1,0 +1,16 @@
+# use full image
+FROM python:3.12  
+ 
+WORKDIR /apps
+ 
+COPY requirements.txt .
+ 
+RUN apt-get update 
+ 
+RUN pip install --no-cache-dir -r requirements.txt 
+ 
+COPY . .
+ 
+EXPOSE 8000 
+
+CMD [ "python", "main.py" ]SS

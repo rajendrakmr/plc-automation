@@ -1,0 +1,299 @@
+:root {
+  --primary: #0170c2;
+  --app-color: #126fc3;
+  /* --navy: #0a1628; */
+  /* --navy-mid: #132040; */
+  --blue: #1a4fd6;
+  --blue-light: #2563eb;
+  --orange: #f97316;
+  --orange-dark: #ea580c;
+  --steel: #64748b;
+  --steel-light: #94a3b8;
+  --bg: #f0f4ff;
+  --white: #ffffff;
+  --card-bg: #ffffff;
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --text-muted: #475569;
+  --text-light-muted: #8fa6c7;
+  --success: #10b981;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --shadow: 0 4px 24px rgba(10, 22, 40, 0.10);
+  --shadow-lg: 0 12px 48px rgba(10, 22, 40, 0.18);
+  --radius: 12px;
+  --radius-lg: 20px;
+  /* Logo Primary Blue — extracted from your brand */
+  --logo-blue: #0066CC;
+  --logo-blue-light: #1a7ae0;
+  --logo-blue-dark: #0052a3;
+
+  /* Footer Navy — dark professional base */
+  --navy: #0B1F3A;
+  --navy-mid: #132040;
+  --navy-light: #1a2d4d;
+
+  /* Accent — Orange (energy, industrial) */
+  --orange: #f97316;
+  --orange-light: #fb923c;
+  --orange-dark: #ea580c;
+
+  /* Supporting — Steel/Slate for text */
+  --steel: #64748b;
+  --steel-light: #94a3b8;
+  --steel-dark: #475569;
+
+  /* Backgrounds */
+  --bg: #f0f4ff;
+  /* Light blue tint */
+  --bg-warm: #f8fafc;
+  /* Neutral white */
+  --card-bg: #ffffff;
+
+  /* Text */
+  --text: #0f172a;
+  /* Near black */
+  --text-muted: #475569;
+  --text-white: #ffffff;
+
+  /* Status */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+
+  /* Shadows */
+  --shadow: 0 4px 24px rgba(11, 31, 58, 0.10);
+  --shadow-lg: 0 12px 48px rgba(11, 31, 58, 0.18);
+  --shadow-blue: 0 8px 32px rgba(0, 102, 204, 0.15);
+
+  /* Borders */
+  --border: #e2e8f0;
+  --border-blue: rgba(0, 102, 204, 0.15);
+
+  /* Gradients */
+  --gradient-hero: linear-gradient(135deg, #0B1F3A 0%, #0066CC 100%);
+  --gradient-card: linear-gradient(135deg, #0066CC 0%, #1a7ae0 100%);
+  --gradient-orange: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+
+  /* Radius */
+  --radius: 12px;
+  --radius-lg: 20px;
+  --radius-sm: 8px;
+}
+ 
+.megaMenuInner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: var(--bg);
+}
+
+/* ── section label above each category ──────── */
+.sectionLabel {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #f97316;
+  margin-bottom: 0.6rem;
+}
+
+.megaMenuResources{
+  padding: 2rem;
+  background:  red  ;
+}
+/* ── grid — columns injected via style prop ──── */
+.megaGrid {
+  display: grid;
+  gap: 0 1.5rem;
+  margin-bottom: 1.5rem;
+  background: #f8fafc;
+}
+
+/* usage: style={{ gridTemplateColumns: `repeat(${cols.length}, 1fr)` }} */
+
+/* ── single column ───────────────────────────── */
+.megaCol {
+  border-right: 1px solid #e2e8f0;
+  padding-right: 1rem;
+}
+
+.megaCol:last-child {
+  border-right: none;
+  padding-right: 0;
+}
+
+/* ── column heading (optional) ───────────────── */
+.megaColHead {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #64748b;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.2rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+ 
+
+.megaCol a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  font-size: 0.85rem;
+  color: var(--white);
+  text-decoration: none;
+  color: var(--white);
+  transition: color 0.2s, padding-left 0.2s;
+  border-radius: 6px;
+}
+
+.megaCol a span {
+  color: var(--white);
+}
+
+.megaCol a:hover {
+  color: var(--blue);
+  padding-left: 0.3rem;
+}
+
+.megaCol a::before {
+  content: '→';
+  font-size: 0.7rem;
+  color: var(--blue);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.megaCol a:hover::before {
+  opacity: 1;
+  color: var(--blue);
+}
+
+/* ── part name ───────────────────────────────── */
+.megaLinkName {
+  font-size: 0.8rem;
+  color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.15s;
+}
+
+.megaLink:hover .megaLinkName {
+  color: #1d4ed8;
+}
+
+/* ── count badge ─────────────────────────────── */
+.megaLinkCount {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #94a3b8;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 0.05rem 0.45rem;
+  line-height: 1.7;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.megaLink:hover .megaLinkCount {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+/* ── dark column variant (featured/last col) ─── */
+.megaColFeatured {
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 1rem;
+  border-right: none;
+}
+
+.megaColFeatured .megaColHead {
+  color: #f97316;
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.megaColFeatured .megaLinkName {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.megaColFeatured .megaLinkCount {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.megaColFeatured .megaLink:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.megaColFeatured .megaLink:hover .megaLinkName {
+  color: #fff;
+}
+
+.megaColFeatured .megaLink:hover .megaLinkCount {
+  background: rgba(249, 115, 22, 0.2);
+  color: #fb923c;
+  border-color: rgba(249, 115, 22, 0.35);
+}
+
+/* ── section divider between categories ──────── */
+.sectionDivider {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 1.2rem 0;
+}
+
+
+
+/* ******************** */
+.blogGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  /* more breathing space */
+}
+
+/* 🔥 Bigger image */
+.blogImageWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  /* keep ratio */
+  /* min-height: 180px;   ⬅️ increased height */
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Optional: even bigger on large screens */
+@media (min-width: 1200px) {
+  .blogImageWrap {
+    min-height: 200px;
+  }
+}
+
+/* Image styling */
+.blogImage {
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.blogCard:hover .blogImage {
+  transform: scale(1.08);
+}
+
+/* 🔥 Bigger title */
+.blogTitle {
+  margin-top: 10px;
+  font-size: 14px;
+  /* slightly bigger */
+  line-height: 1.5;
+  min-height: 40px;
+  color: var(--white);
+}

@@ -224,13 +224,13 @@
 
  .pc-grid {
      display: grid;
-     grid-template-columns: repeat(4, 1fr);
+     grid-template-columns: repeat(3, 1fr);
      gap: 1.4rem;
  }
 
  .pcm-grid {
      display: grid;
-     grid-template-columns: repeat(3, 1fr);
+     grid-template-columns: repeat(2, 1fr);
      gap: 1.4rem;
  }
 
@@ -394,7 +394,7 @@
  }
 
  .badge-out {
-     background: rgb(211, 47, 47);
+     background: #a61c00;
      ;
      color: rgb(255, 255, 255);
      ;
@@ -457,7 +457,7 @@
 
  .cats-grid {
      display: grid;
-     grid-template-columns: repeat(4, 1fr);
+     grid-template-columns: repeat(3, 1fr);
      gap: 1.2rem;
      padding: 8px;
  }

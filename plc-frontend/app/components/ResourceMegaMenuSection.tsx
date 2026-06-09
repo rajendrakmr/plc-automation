@@ -69,7 +69,7 @@ export default function ResourceMegaMenuSection({popularBrands, resources}: {pop
                                         </span>
 
                                         <span className="rk_mega_card_cta">
-                                            View all parts
+                                            Read Now
                                         </span>
                                     </div>
                                 </Link>

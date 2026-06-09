@@ -95,9 +95,9 @@ export default function LatestBlogSection() {
                     By Plc Automation Group
                   </span>
 
-                  <span>Apr 28, 2025</span>
+                  {/* <span>Apr 28, 2025</span> */}
 
-                  <span>8 min read</span>
+                  {/* <span>8 min read</span> */}
                 </div>
 
                 <h3 className="rk_blog_featured_title">
@@ -158,10 +158,10 @@ export default function LatestBlogSection() {
                   </div>
 
                   <div className="rk_blog_card_body">
-                    <div className="rk_blog_meta">
+                    {/* <div className="rk_blog_meta">
                       <span>{slide.date}</span>
                       <span>5 min read</span>
-                    </div>
+                    </div> */}
 
                     <h3 className="rk_blog_card_title">
                       {slide.title}

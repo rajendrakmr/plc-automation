@@ -11,8 +11,8 @@ interface Product {
     image?: string;
     partNumber?: string;
     description?: string;
-    stock?: "In Stock" | "Limited" | "Obsolete";
-    status?: "In Stock" | "Limited" | "Obsolete";
+    stock?: "In Stock" | "Limited" | "Back Order";
+    status?: "In Stock" | "Limited" | "Back Order";
     category?: string;
     href?: string;
 }
@@ -27,8 +27,8 @@ const stockConfig = {
         label: "Limited",
         className: "badge-stock badge-low warning",
     },
-    "Obsolete": {
-        label: "Obsolete",
+    "Back Order": {
+        label: "Back Order",
         className: "badge-stock badge-out error",
     }
 };
@@ -50,10 +50,7 @@ export default function PCCard({ products }: { products: Product[] }) {
                     <div
                         className="pc-card"
                         key={p.id}
-                    >
-
-
-                        {/* BODY */}
+                    > 
                         <div className="pc-body">
                             <h4 className="pc-name"> 
                                 {p.name}

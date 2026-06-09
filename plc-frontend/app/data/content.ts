@@ -12,7 +12,7 @@ export type ProductItem = {
   id?: number;
   name: string;
   brand: string;
-  status: "In Stock" | "Limited" | "Obsolete";
+  status: "In Stock" | "Limited" | "Back Order";
   partNumber: string;
   description: string;
   image?: string;
@@ -85,11 +85,12 @@ export const legals: Brands[] = [
 ];
 
 export const resources: Brands[] = [
-  { name: "Offer Product", url: "/offer-product-list" },
-  { name: "Term & Conditions", url: "/terms-conditions" },
-  { name: "Privacy Policy", url: "/privacy-policy" },
+  { name: "About Us", url: "/about-us" },
   { name: "Careers", url: "/careers" },
-  { name: "Disclaimer", url: "/disclaimer" },
+  { name: "Privacy Policy", url: "/privacy-policy" },
+  { name: "Terms & Conditions", url: "/terms-conditions" },
+  { name: "Disclaimer", url: "/disclaimer" }, 
+  { name: "Contact Us", url: "/contact-us" },
 ];
 export const userFullLinks: Brands[] = [
   { name: "About Us", url: "/about-us" },
@@ -144,7 +145,7 @@ export const catalogProducts: ProductItem[] = [
     id: 4,
     name: "Modicon M340 Processor Module",
     brand: "Schneider",
-    status: "Obsolete",
+    status: "Back Order",
     partNumber: "BMXP342030",
     image: "/assets/products/1713098462.jpg",
     description:
@@ -194,7 +195,7 @@ export const catalogProducts: ProductItem[] = [
     id: 9,
     name: "Schneider Magelis HMI",
     brand: "Schneider",
-    status: "Obsolete",
+    status: "Back Order",
     partNumber: "HMIGTO5310",
     image: "/assets/products/1713098462.jpg",
     description:
@@ -259,7 +260,7 @@ export const catalogProductPages: ProductItem[][] = [
       id: 15,
       name: "Honeywell C300 Controller",
       brand: "Honeywell",
-      status: "Obsolete",
+      status: "Back Order",
       partNumber: "CC-PCNT01",
       image: "/assets/products/1713098462.jpg",
       description:

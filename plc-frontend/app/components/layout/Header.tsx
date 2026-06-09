@@ -22,22 +22,22 @@ const blogs = [
   {
     name: "How PLC Automation Works",
     image: "/assets/engineering-services-1.jpg",
-    url: "/blogs/plc-automation"
+    url: "/blog/plc-automation"
   },
   {
     name: "Top 5 Siemens PLC Tips",
     image: "/assets/engineering-services-2.jpg",
-    url: "/blogs/siemens-tips"
+    url: "/blog/siemens-tips"
   },
   {
     name: "Troubleshooting Drives",
     image: "/assets/engineering-services-5.jpg",
-    url: "/blogs/drives-troubleshooting"
+    url: "/blog/drives-troubleshooting"
   },
   {
     name: "Industrial IoT Guide",
     image: "/assets/engineering-services-3.jpg",
-    url: "/blogs/iiot-guide"
+    url: "/blog/iiot-guide"
   }
 ];
 
@@ -255,7 +255,7 @@ export default function Header() {
                   <li className="nav-item rk_has_mega">
                     <Link
                       className="nav-link"
-                      href="/brands"
+                      href="#"
                     >
                       Manufacturers
                       <svg viewBox="0 0 10 6">
@@ -268,7 +268,7 @@ export default function Header() {
 
                   {/* RESOURCES */}
                   <li className="nav-item rk_has_mega">
-                    <Link className="nav-link" href="">
+                    <Link className="nav-link" href="#">
                       Resources
                       <svg viewBox="0 0 10 6">
                         <path d="M0 0l5 6 5-6z" />

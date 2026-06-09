@@ -2,22 +2,15 @@
 
 
 import { faqByCategory } from "@/app/data/content";
-import { useMemo, useState } from "react";
-
-// type Category = "general" | "sourcing" | "shipping" | "warranty";
-
+import { useMemo, useState } from "react"; 
 type Category = keyof typeof faqByCategory;
 export default function FaqSection() {
     const [activeTab, setActiveTab] = useState<Category>("Ordering");
-    const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-    // ✅ Memoized categories
+    const [openIndex, setOpenIndex] = useState<number | null>(0); 
     const categories = useMemo(
         () => Object.keys(faqByCategory) as Category[],
         []
-    );
-
-    // ✅ Memoized active FAQ list
+    ); 
     const activeFaqs = useMemo(
         () => faqByCategory[activeTab],
         [activeTab]
@@ -26,22 +19,15 @@ export default function FaqSection() {
     const toggleFaq = (index: number) => {
         setOpenIndex(openIndex === index ? null : index);
     };
-
-
-
-
+ 
 
     return (
         <section className="section_white_content">
             <div className="section_container">
-                <div className="faq-right">
-
-                {/* Tabs */}
+                <div className="faq-right"> 
                 <div className="faq-tabs">
                     <h3 className="faq-title">FAQs</h3>
-                </div>
-
-                {/* Accordion */}
+                </div> 
                 <div className="faq-group active">
                     {faqByCategory[activeTab].map((item, i) => (
                         <div
@@ -58,7 +44,7 @@ export default function FaqSection() {
                             <div
                                 className="faq-a"
                                 style={{
-                                    maxHeight: openIndex === i ? "200px" : "0px",
+                                    maxHeight: openIndex === i ? "250px" : "0px",
                                 }}
                             >
                                 <p>{item.answer}</p>

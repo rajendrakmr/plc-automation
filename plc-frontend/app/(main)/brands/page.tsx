@@ -8,6 +8,8 @@ import BrandsDirectory from "@/app/components/BrandsDirectory";
 import ProductBredCrumbs from "@/app/components/main-ui/ProductBredCrumbs";
 import ManufacturersSection from "@/app/components/main-ui/ManufacturersSection";
 import Image from "next/image";
+import PrdHeroBannerSection from "@/app/components/main-ui/PrdHeroBannerSection";
+import TrustBadgeSection from "@/app/components/main-ui/TrustBadgeSection";
 
 export const metadata = {
   title: "Brands",
@@ -67,37 +69,7 @@ export default async function Brands({
 
             {/* FEATURES */}
             <div className="mmp-features">
-              <ul>
-                <li>
-                  <Image
-                    src="/assets/Icons/globus-plcautomationgroup.png"
-                    alt="Delivery Icon"
-                    width={20}
-                    height={20}
-                  />
-                  Parts delivered worldwide
-                </li>
-
-                <li>
-                  <Image
-                    src="/assets/Icons/cup-plcautomationgroup.png"
-                    alt="Award Winning Icon"
-                    width={20}
-                    height={20}
-                  />
-                  Award-winning service
-                </li>
-
-                <li>
-                  <Image
-                    src="/assets/Icons/calendar-plcautomationgroup.png"
-                    alt="Warranty Icon"
-                    width={20}
-                    height={20}
-                  />
-                  Full 12-month warranty
-                </li>
-              </ul>
+               <TrustBadgeSection />
             </div>
           </div>
 
@@ -113,7 +85,7 @@ export default async function Brands({
                 preload="metadata"
               >
                 <source
-                  src="https://plcautomationgroup.com/images/globe.mp4"
+                  src="/assets/plc_automation/plcautomation-animation-video.mp4"
                   type="video/mp4"
                 />
               </video>
@@ -121,7 +93,7 @@ export default async function Brands({
           </div>
         </div>
       </section>
- 
+      <PrdHeroBannerSection />
       <ContactUsSection />
     </main>
   );

@@ -6,6 +6,7 @@ import ManufacturersSection from "@/app/components/main-ui/ManufacturersSection"
 import ContactUsSection from "@/app/components/ContactUsSection"; 
 import Image from "next/image";
 import HeroBannerSection from "../components/main-ui/HeroBannerSection";
+import TrustBadgeSection from "../components/main-ui/TrustBadgeSection";
 
 export const metadata = {
   title: "PLC Automation Group – Your Global Partner for Industrial Automation & PLC Solutions",
@@ -77,37 +78,8 @@ export default function Home() {
 
             {/* FEATURES */}
             <div className="mmp-features">
-              <ul>
-                <li>
-                  <Image
-                    src="/assets/Icons/globus-plcautomationgroup.png"
-                    alt="Delivery Icon"
-                    width={20}
-                    height={20}
-                  />
-                  Parts delivered worldwide
-                </li>
-
-                <li>
-                  <Image
-                    src="/assets/Icons/cup-plcautomationgroup.png"
-                    alt="Award Winning Icon"
-                    width={20}
-                    height={20}
-                  />
-                  Award-winning service
-                </li>
-
-                <li>
-                  <Image
-                    src="/assets/Icons/calendar-plcautomationgroup.png"
-                    alt="Warranty Icon"
-                    width={20}
-                    height={20}
-                  />
-                  Full 12-month warranty
-                </li>
-              </ul>
+                <TrustBadgeSection />
+               
             </div>
           </div>
 
@@ -122,8 +94,8 @@ export default function Home() {
                 playsInline
                 preload="metadata"
               >
-                <source
-                  src="https://plcautomationgroup.com/images/globe.mp4"
+               <source
+                  src="/assets/plc_automation/plcautomation-animation-video.mp4"
                   type="video/mp4"
                 />
               </video>

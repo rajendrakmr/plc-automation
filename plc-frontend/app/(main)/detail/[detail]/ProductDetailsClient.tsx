@@ -13,6 +13,12 @@ import DeliverySection from "@/app/components/main-ui/DeleverySection";
 import ServiceSection from "@/app/components/main-ui/ServiceSection";
 import BreadCrumbsSection from "@/app/components/BredCrumbsSection";
 import FaqSection from "@/app/components/main-ui/FAQSection";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import QuoteForm from "@/app/components/main-ui/QuoteForm";
+import PrdHeroBannerSection from "@/app/components/main-ui/PrdHeroBannerSection";
+import TrustBadgeSection from "@/app/components/main-ui/TrustBadgeSection";
+
 type Product = {
     partNumber: string;
     name: string;
@@ -160,37 +166,7 @@ export default function ProductDetailsClient({
                         <hr />
 
                         <div className="mmp-features" ref={badgeRef}>
-                            <ul>
-                                <li>
-                                    <Image
-                                        src="/assets/Icons/globus-plcautomationgroup.png"
-                                        alt="Delivery Icon"
-                                        width={16}
-                                        height={16}
-                                    />
-                                    Parts delivered worldwide
-                                </li>
-
-                                <li>
-                                    <Image
-                                        src="/assets/Icons/cup-plcautomationgroup.png"
-                                        alt="Award Winning Icon"
-                                        width={16}
-                                        height={16}
-                                    />
-                                    Award-winning service
-                                </li>
-
-                                <li>
-                                    <Image
-                                        src="/assets/Icons/calendar-plcautomationgroup.png"
-                                        alt="Warranty Icon"
-                                        width={16}
-                                        height={16}
-                                    />
-                                    Full 12-month warranty
-                                </li>
-                            </ul>
+                             <TrustBadgeSection />
                         </div>
 
                         <hr />
@@ -345,60 +321,21 @@ export default function ProductDetailsClient({
 
                     {/* RIGHT */}
                     <div className="pd-right" id="quote-section">
-                        <h3 style={{ background: "var(--blue)", color: "#fff", padding: "10px" }}>
-                            Get a quick price for{" "}
-                            {product.brand}{" "}
-                            {product.partNumber}
-                        </h3>
-                        <div className="rfq-card" >
-
-
-
-                            <form className="rfq-form">
-                                <input
-                                    type="text"
-                                    placeholder="Name"
-                                />
-
-                                <input
-                                    type="tel"
-                                    placeholder="Phone Number"
-                                />
-
-                                <input
-                                    type="email"
-                                    placeholder="Email"
-                                />
-
-                                <textarea
-                                    placeholder="Message"
-                                />
-
-                                <button type="submit">
-                                    Request Quote
-                                </button>
-                            </form>
-
-                            <p className="privacy">
-                                For more information on how
-                                your data is processed,
-                                read our privacy policy.
-                            </p>
-
-                        </div>
+                        <QuoteForm product={product} />
                     </div>
 
                 </div>
             </section>
-            <section className="section_white_content" id="delivery-section"> 
+            <section className="section_white_content" id="delivery-section">
                 <DeliverySection />
             </section>
             <ServiceSection />
 
 
-            <section className="section_white_content" id="review-section">
+            <section className="section_white_content" id="review-section" style={{paddingBottom:"50px"}}>
                 <ReviewSlider />
             </section>
+            <PrdHeroBannerSection />
             <FaqSection />
 
 

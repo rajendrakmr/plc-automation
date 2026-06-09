@@ -1133,7 +1133,7 @@ input[type="checkbox"] { width: 15px; height: 15px; cursor: pointer; accent-colo
 .badge-stock::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
 .badge-in  { background: #dcfce7; color: #14532d; } .badge-in::before  { background: #16a34a; }
 .badge-low { background: #fef9c3; color: #713f12; } .badge-low::before { background: #ca8a04; }
-.badge-out { background: #fee2e2; color: #7f1d1d; } .badge-out::before { background: #dc2626; }
+.badge-out { background: #fee2e2; color: #a61c00; } .badge-out::before { background: #dc2626; }
 .action-btn { background: none; border: none; cursor: pointer; padding: 5px 6px; border-radius: 6px; color: #94a3b8; font-size: 14px; transition: background 0.12s, color 0.12s; }
 .action-btn:hover { background: #f1f5f9; color: #1e293b; }
 .action-btn.danger:hover { background: #fee2e2; color: #dc2626; }

@@ -1,13 +1,7 @@
 "use client";
-import FeatureHighlightsBar from "@/app/components/FeatureHighlightsBar";
-// import ProductCategory from "@/app/components/sections/common/ProductCategory";
-// import ProductCategory from "@/app/components/sections/ProductSection";
+import FeatureHighlightsBar from "@/app/components/FeatureHighlightsBar"; 
 import { useMemo, useState } from "react";
-
-// export const metadata = {
-//     title: "Exclusive Offers on PLC Automation Group Products | Siemens, Allen-Bradley, ABB, Danfoss, Honeywell & B&R | Industrial Spare Parts Deals",
-//     description: "Grab exclusive offers on top automation products from Siemens, Danfoss, Honeywell, B&R, and Lenze. Find discounted models like Siemens 6ES7331-7KF02-0AB0, Danfoss 060G4412, Honeywell GLZ8C-DEU, and more. Shop now for the best deals on industrial automation spare parts!",
-// };
+ 
 
 import {
     Button,
@@ -19,9 +13,9 @@ import {
 } from "@mui/material";
 
 import { catalogProductPages } from "@/app/data/content";
-import PCCard from "@/app/components/PCCard";
-import BreadCrumb from "@/app/components/sections/BreadCrumb";
+import PCCard from "@/app/components/PCCard"; 
 import ProductBredCrumbs from "@/app/components/main-ui/ProductBredCrumbs";
+import PrdHeroBannerSection from "@/app/components/main-ui/PrdHeroBannerSection";
 
 type Props = {
     params: Promise<{
@@ -359,6 +353,7 @@ export default function OfferProductList({
 
                 </div>
             </section>
+             <PrdHeroBannerSection />
             {/* <ProductCategory /> */}
         </main>
     );

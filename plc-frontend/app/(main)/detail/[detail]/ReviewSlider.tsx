@@ -43,7 +43,7 @@ export default function ReviewSlider() {
   return (
     <>
       {/* HEADER */}
-      <div className="section_container reviews-header">
+      <div className="section_container reviews-header" style={{paddingBottom:"25px"}}>
         <div>
           <h2>Customer Reviews</h2>
           <p>Trusted by engineers worldwide</p>
@@ -81,7 +81,7 @@ export default function ReviewSlider() {
 
               <div className="review-footer">
                 <span>{r.author}</span>
-                <span>{r.date}</span>
+                {/* <span>{r.date}</span> */}
               </div>
             </Box>
           </SwiperSlide>

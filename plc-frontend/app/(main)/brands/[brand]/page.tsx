@@ -5,6 +5,7 @@ import FeatureHighlightsBar from "@/app/components/FeatureHighlightsBar";
 import ContactUsSection from "@/app/components/ContactUsSection";
 import ProductAboutSection from "@/app/components/ProductAboutSection";
 import ProductBredCrumbs from "@/app/components/main-ui/ProductBredCrumbs";
+import PrdHeroBannerSection from "@/app/components/main-ui/PrdHeroBannerSection";
 
 export const metadata = {
     title: "Brands",
@@ -23,9 +24,9 @@ export default async function Brands({
     const { brand } = await params;
 
     const brandName = decodeURIComponent(brand);
-const formattedBrand =
-  brandName.charAt(0).toUpperCase() +
-  brandName.slice(1).toLowerCase();
+    const formattedBrand =
+        brandName.charAt(0).toUpperCase() +
+        brandName.slice(1).toLowerCase();
     return (
         <main>
             <FeatureHighlightsBar />
@@ -49,7 +50,7 @@ const formattedBrand =
             <ProductAboutSection products={{ title: formattedBrand, description: "" }} />
 
             <BrandProductList />
-
+            <PrdHeroBannerSection />
             <ContactUsSection />
         </main>
     );

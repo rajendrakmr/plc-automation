@@ -1,7 +1,7 @@
 "use client";
-import FeatureHighlightsBar from "@/app/components/FeatureHighlightsBar"; 
-import { useMemo, useState } from "react";
- 
+import FeatureHighlightsBar from "@/app/components/FeatureHighlightsBar";
+import { useState, useEffect } from "react";
+import { PaginatedResponse } from "@/app/components/hooks/useFetch";
 
 import {
     Button,
@@ -12,114 +12,111 @@ import {
     Typography,
 } from "@mui/material";
 
-import { catalogProductPages } from "@/app/data/content";
-import PCCard from "@/app/components/PCCard"; 
+import PCCard from "@/app/components/PCCard";
 import ProductBredCrumbs from "@/app/components/main-ui/ProductBredCrumbs";
 import PrdHeroBannerSection from "@/app/components/main-ui/PrdHeroBannerSection";
+import { useFetchData } from "@/app/utils/useFetchData";
+import { useGetData } from "@/app/utils/useGetData";
+import { FetchLoader } from "@/app/components/FetchLoader";
 
+interface Categories {
+    category_id: number;
+    cat_name: string;
+    cat_slug: string;
+}
 type Props = {
     params: Promise<{
         brand: string;
     }>;
 };
+
+
+
+export interface ProductMeta {
+    plc_trn_pmeta_id: number;
+    product_id: number;
+    meta_key: string;
+    meta_title: string;
+    meta_desc: string;
+    created_at: string;
+}
+
+export interface Category {
+    category_id: number;
+    cat_name: string;
+}
+
+export interface ProductType {
+    product_type_id: number;
+    name: string;
+}
+
+export interface Product {
+    product_id: number;
+    part_no: string;
+    short_desc: string;
+    image_url: string;
+    meta_keywords: string;
+    stock: "in-stock" | "limited" | "out-stock";
+    url: string;
+    product_desc: string;
+    meta_title: string;
+    meta_description: string;
+    meta: ProductMeta[];
+    category: Category;
+    product_type: ProductType;
+}
+
+
+function useDebounce<T>(value: T, delay = 400): T {
+    const [debounced, setDebounced] = useState(value);
+    useEffect(() => {
+        const timer = setTimeout(() => setDebounced(value), delay);
+        return () => clearTimeout(timer);
+    }, [value, delay]);
+    return debounced;
+}
 export default function OfferProductList({
     params,
 }: Props) {
 
-    const [manufacturer, setManufacturer] = useState("");
-    const [availability, setAvailability] = useState("");
     const [search, setSearch] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-
-    const productsPerPage = 6;
-
-    /* ALL PRODUCTS */
-    const allProducts = useMemo(
-        () => catalogProductPages.flat(),
-        []
-    );
-
-    /* FILTER OPTIONS */
-    const manufacturerOptions = useMemo(
-        () =>
-            [...new Set(allProducts.map((p) => p.brand))]
-                .filter(Boolean)
-                .sort(),
-        [allProducts]
-    );
-
-    const availabilityOptions = useMemo(
-        () =>
-            [...new Set(allProducts.map((p) => p.status))]
-                .filter(Boolean),
-        [allProducts]
-    );
-
-    /* FILTER PRODUCTS */
-    const filteredProducts = useMemo(() => {
-        return allProducts.filter((p) => {
-            const manufacturerMatch =
-                !manufacturer ||
-                p.brand === manufacturer;
-
-            const availabilityMatch =
-                !availability ||
-                p.status === availability;
-
-            const searchMatch =
-                p.name
-                    ?.toLowerCase()
-                    .includes(search.toLowerCase()) ||
-                p.partNumber
-                    ?.toLowerCase()
-                    .includes(search.toLowerCase()) ||
-                p.brand
-                    ?.toLowerCase()
-                    .includes(search.toLowerCase());
-
-            return (
-                manufacturerMatch &&
-                availabilityMatch &&
-                searchMatch
-            );
-        });
-    }, [
-        allProducts,
-        manufacturer,
-        availability,
-        search,
-    ]);
-
-    /* PAGINATION */
-    const totalPages = Math.ceil(
-        filteredProducts.length /
-        productsPerPage
-    );
-
-    const currentProducts = useMemo(() => {
-        const start =
-            (currentPage - 1) *
-            productsPerPage;
-
-        const end =
-            start + productsPerPage;
-
-        return filteredProducts.slice(
-            start,
-            end
-        );
-    }, [
-        filteredProducts,
-        currentPage,
-    ]);
-
-    /* RESET */
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(12);
+    const [stock, setStockSearch] = useState("");
+    const [category_id, setCategoryId] = useState(0);
+    const debouncedSearch = useDebounce(search, 400);
+    const availabilityOptions = [
+        { label: "In Stock", value: "in-stock" },
+        { label: "Limited", value: "limited" },
+        { label: "Back Order", value: "out-stock" },
+    ];
     const resetFilters = () => {
-        setManufacturer("");
-        setAvailability("");
+        setCategoryId(0);
+        setStockSearch("");
         setSearch("");
-        setCurrentPage(1);
+        setPage(1);
     };
+
+    const { data: categories, loading: catLoading } = useFetchData<Categories[]>({
+        url: '/categories/list'
+    });
+
+    const { loading, data, total, totalPages, isSearchLoading } =
+        useGetData<PaginatedResponse<Product>>({
+            url: "/products/list",
+            params: {
+                page,
+                limit,
+                search: debouncedSearch || undefined,
+                stock: stock || undefined,
+                category_id: category_id || undefined,
+            },
+        });
+
+    const products = data?.records ?? [];
+    const isLoading = loading || isSearchLoading;
+
     return (
         <main>
             <FeatureHighlightsBar />
@@ -133,16 +130,13 @@ export default function OfferProductList({
                     },
                     {
                         label: "Offer Product",
-                        link: "/brands",
+                        link: "",
                     },
                 ]}
             />
             <section className="section_white_content">
                 <div className="section_container rm_section">
-
                     <div className="rm_container">
-
-                        {/* LEFT FILTER */}
                         <aside className="rm_filter">
 
                             <CardContent>
@@ -163,12 +157,10 @@ export default function OfferProductList({
                                         select
                                         label="Manufacturer"
                                         size="small"
-                                        value={manufacturer}
+                                        value={category_id}
                                         onChange={(e) => {
-                                            setManufacturer(
-                                                e.target.value
-                                            );
-                                            setCurrentPage(1);
+                                            setCategoryId(parseInt(e.target.value));
+                                            setPage(1);
                                         }}
                                         fullWidth
                                         SelectProps={{
@@ -186,17 +178,17 @@ export default function OfferProductList({
                                             }
                                         }}
                                     >
-                                        <MenuItem value="">
+                                        <MenuItem value={0}>
                                             All
                                         </MenuItem>
 
-                                        {manufacturerOptions.map(
+                                        {categories?.map(
                                             (item) => (
                                                 <MenuItem
-                                                    key={item}
-                                                    value={item}
+                                                    key={item.category_id}
+                                                    value={item.category_id}
                                                 >
-                                                    {item}
+                                                    {item.cat_name}
                                                 </MenuItem>
                                             )
                                         )}
@@ -206,13 +198,10 @@ export default function OfferProductList({
                                         select
                                         label="Availability"
                                         size="small"
-                                        value={availability}
+                                        value={stock}
                                         onChange={(e) => {
-                                            setAvailability(
-                                                e.target.value
-                                            );
-
-                                            setCurrentPage(1);
+                                            setStockSearch(e.target.value);
+                                            setPage(1);
                                         }}
                                         fullWidth
                                     >
@@ -223,10 +212,10 @@ export default function OfferProductList({
                                         {availabilityOptions.map(
                                             (item) => (
                                                 <MenuItem
-                                                    key={item}
-                                                    value={item}
+                                                    key={item?.label}
+                                                    value={item?.value}
                                                 >
-                                                    {item}
+                                                    {item?.label}
                                                 </MenuItem>
                                             )
                                         )}
@@ -235,14 +224,14 @@ export default function OfferProductList({
                                     <TextField
                                         label="Search"
                                         size="small"
-                                        placeholder="Search product..."
+                                        placeholder="Search part No..."
                                         value={search}
                                         onChange={(e) => {
                                             setSearch(
                                                 e.target.value
                                             );
 
-                                            setCurrentPage(1);
+                                            setPage(1);
                                         }}
                                         fullWidth
                                     />
@@ -270,82 +259,72 @@ export default function OfferProductList({
 
                         {/* RIGHT SIDE */}
                         <div className="rm_content">
-
                             <div className="rm_topbar">
-
                                 <div className="rm_count">
-
-                                    Showing{" "}
-                                    <strong>
-                                        {
-                                            filteredProducts.length
-                                        }
-                                    </strong>{" "}
-                                    products
-
+                                    Showing <strong> {total} </strong> products
                                 </div>
-
                             </div>
+                            <div style={{ position: "relative", minHeight: "200px" }}>
+                                <FetchLoader show={isLoading} />
+                                <div className="rm_grid">
+                                    <PCCard products={products} />
+                                </div>
+                            </div>
+                            {!isLoading && products.length === 0 && (
+                                <div className="rm_empty">No products found.</div>
+                            )}
 
-                            {filteredProducts.length >
-                                0 ? (
+                            {products.length > 0 && (
                                 <>
-                                    <div className="rm_grid">
+                                    {totalPages > 1 && (
+                                        <div className="pagination">
 
-                                        <PCCard
-                                            products={
-                                                currentProducts
-                                            }
-                                        />
-
-                                    </div>
-
-                                    {totalPages >
-                                        1 && (
-                                            <div className="rm_pagination">
-
-                                                {[...Array(
-                                                    totalPages
-                                                )].map(
-                                                    (
-                                                        _,
-                                                        i
-                                                    ) => (
+                                            {/* Prev */}
+                                            <button
+                                                disabled={page === 1}
+                                                onClick={() => setPage((p) => p - 1)}
+                                            >
+                                                &laquo;
+                                            </button>
+                                            {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                                .filter((p) => {
+                                                    if (totalPages <= 7) return true;
+                                                    if (p === 1 || p === totalPages) return true;
+                                                    if (Math.abs(p - page) <= 2) return true;
+                                                    return false;
+                                                })
+                                                .reduce<(number | "...")[]>((acc, p, idx, arr) => {
+                                                    if (idx > 0 && p - (arr[idx - 1] as number) > 1) {
+                                                        acc.push("...");
+                                                    }
+                                                    acc.push(p);
+                                                    return acc;
+                                                }, [])
+                                                .map((item, idx) =>
+                                                    item === "..." ? (
+                                                        <span key={`dot-${idx}`} className="pagination-dots">...</span>
+                                                    ) : (
                                                         <button
-                                                            key={
-                                                                i
-                                                            }
-                                                            className={
-                                                                currentPage ===
-                                                                    i +
-                                                                    1
-                                                                    ? "active"
-                                                                    : ""
-                                                            }
-                                                            onClick={() =>
-                                                                setCurrentPage(
-                                                                    i +
-                                                                    1
-                                                                )
-                                                            }
+                                                            key={item}
+                                                            className={page === item ? "active" : "pg-item"}
+                                                            onClick={() => setPage(item as number)}
                                                         >
-                                                            {i +
-                                                                1}
+                                                            {item}
                                                         </button>
                                                     )
                                                 )}
+                                            <button
+                                                disabled={page === totalPages}
+                                                onClick={() => setPage((p) => p + 1)}
+                                            >
+                                                &raquo;
+                                            </button>
 
-                                            </div>
-                                        )}
+                                        </div>
+                                    )}
 
                                 </>
-                            ) : (
-                                <div className="rm_empty">
-
-                                    No products found
-
-                                </div>
-                            )}
+                            ) }
 
                         </div>
 
@@ -353,8 +332,7 @@ export default function OfferProductList({
 
                 </div>
             </section>
-             <PrdHeroBannerSection />
-            {/* <ProductCategory /> */}
+            <PrdHeroBannerSection />
         </main>
     );
 }

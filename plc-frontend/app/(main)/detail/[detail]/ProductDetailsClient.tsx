@@ -18,14 +18,7 @@ import "react-phone-input-2/lib/style.css";
 import QuoteForm from "@/app/components/main-ui/QuoteForm";
 import PrdHeroBannerSection from "@/app/components/main-ui/PrdHeroBannerSection";
 import TrustBadgeSection from "@/app/components/main-ui/TrustBadgeSection";
-
-type Product = {
-    partNumber: string;
-    name: string;
-    brand: string;
-    status: string;
-    description: string;
-};
+import { Product } from "@/app/types";
 
 type Props = {
     product: Product;
@@ -102,7 +95,7 @@ export default function ProductDetailsClient({
 
             <StickyQuoteBar
                 visible={showSticky}
-                partNo={product.partNumber}
+                partNo={product.part_no}
                 onQuoteClick={() => scrollToSection("quote-section")}
                 onDeleveryClick={() => scrollToSection("delivery-section")}
                 onReviewClick={() => scrollToSection("review-section")}
@@ -110,16 +103,16 @@ export default function ProductDetailsClient({
 
             <BreadCrumbsSection
                 cl="section_white_content"
-                title={product.partNumber}
+                title={product.part_no}
                 bgImage="/assets/engineering-services-4.jpg"
                 items={[
                     { label: "Home", link: "/" },
                     { label: "Brands", link: "/offer-product-list" },
                     {
-                        label: product.brand,
+                        label: product.part_no,
                         link: "/offer-product-list",
                     },
-                    { label: product.partNumber },
+                    { label: product.part_no },
                 ]}
             />
 
@@ -130,11 +123,11 @@ export default function ProductDetailsClient({
                     {/* LEFT */}
                     <div className="pd-left">
                         <h1 className="pd-code">
-                            {product.partNumber}
+                            {product.part_no}
                         </h1>
 
                         <h2 className="pd-title">
-                            {product.name}
+                            {/* {product.name} */}
                         </h2>
 
                         <div className="pd-badges">
@@ -166,7 +159,7 @@ export default function ProductDetailsClient({
                         <hr />
 
                         <div className="mmp-features" ref={badgeRef}>
-                             <TrustBadgeSection />
+                            <TrustBadgeSection />
                         </div>
 
                         <hr />
@@ -175,20 +168,27 @@ export default function ProductDetailsClient({
                             <tbody>
                                 <tr>
                                     <td>Manufacturer</td>
-                                    <td>{product.brand}</td>
+                                    <td>{product.category.cat_name}</td>
                                 </tr>
 
                                 <tr>
                                     <td>Part Number</td>
-                                    <td>{product.partNumber}</td>
+                                    <td>{product.part_no}</td>
                                 </tr>
 
                                 <tr>
                                     <td>Status</td>
-                                    <td>{product.status}</td>
+                                    <td>{product.stock}</td>
                                 </tr>
                             </tbody>
                         </table>
+
+                        {
+                            product.product_desc && <div
+                                className="product_desc"
+                                dangerouslySetInnerHTML={{ __html: product.product_desc }}
+                            />
+                        }
 
 
                         <div className="next-steps">
@@ -332,7 +332,7 @@ export default function ProductDetailsClient({
             <ServiceSection />
 
 
-            <section className="section_white_content" id="review-section" style={{paddingBottom:"50px"}}>
+            <section className="section_white_content" id="review-section" style={{ paddingBottom: "50px" }}>
                 <ReviewSlider />
             </section>
             <PrdHeroBannerSection />

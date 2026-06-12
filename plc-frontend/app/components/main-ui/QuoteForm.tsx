@@ -4,12 +4,8 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import Link from "next/link";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-
-interface Product {
-    brand: string;
-    partNumber: string;
-}
-
+import { Product } from "@/app/types";
+ 
 interface QuoteFormProps {
     product: Product;
 }
@@ -43,7 +39,7 @@ export default function QuoteForm({ product }: QuoteFormProps) {
 
         console.log({
             ...formData,
-            product: `${product.brand} ${product.partNumber}`,
+            product: `${product.category.cat_name} ${product.part_no}`,
         });
 
         // API call here
@@ -53,7 +49,7 @@ export default function QuoteForm({ product }: QuoteFormProps) {
         <div className="quoteform">
             <div className="quote-header"> 
                 <p>
-                    <span>Get a quick quote for </span><span style={{fontWeight:"normal"}}>{product.brand} - {product.partNumber}</span>
+                    <span>Get a quick quote for </span><span style={{fontWeight:"normal"}}>{product.category.cat_name} - {product.part_no}</span>
                 </p>
             </div>
 
@@ -74,6 +70,7 @@ export default function QuoteForm({ product }: QuoteFormProps) {
                         <PhoneInput
                             country={"us"}
                             enableSearch
+                             regions={['north-america', 'carribean']}
                             value={formData.phone}
                             onChange={(phone) =>
                                 setFormData((prev) => ({

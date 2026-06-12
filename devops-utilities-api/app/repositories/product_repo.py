@@ -1,7 +1,10 @@
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload,load_only
 from typing import Optional, Tuple, List
 from app.models.products import Product 
 from app.schemas.products import ProductCreate,ProductUpdate
+from app.models.category import Category
+from app.models.product_type import ProductType
+
 from fastapi import HTTPException, status
  
 
@@ -110,9 +113,7 @@ def get_all(
         joinedload(Product.product_type),
         joinedload(Product.meta)
     )
-    
-
-    # Filters
+     
     if category_id is not None:
         query = query.filter(Product.category_id == category_id)
 
@@ -124,8 +125,7 @@ def get_all(
 
     if status:
         query = query.filter(Product.status == status)
-
-    # 🔥 SEARCH FIX (important)
+ 
     if search:
         search = f"%{search.lower()}%"
         query = query.filter(
@@ -147,66 +147,72 @@ def get_all(
     )
 
     return products, total
+ 
+ 
+ 
+ 
+def list_all(
+    db: Session,
+    page: int,
+    limit: int,
+    category_id: Optional[int] = None,
+    search: Optional[str] = None,
+    product_type_id: Optional[int] = None,
+    url: Optional[str] = None,
+    stock: Optional[str] = None,
+    status: Optional[str] = None
+) -> tuple[list[Product], int]:
+     
+    query = db.query(Product) 
+    if category_id:
+        query = query.filter(Product.category_id == category_id)
 
-# class ProductRepository:
+    if product_type_id:
+        query = query.filter(Product.product_type_id == product_type_id)
 
-#     def __init__(self, db: Session):
-#         self.db = db
+    if stock:
+        query = query.filter(Product.stock == stock)
 
-#     def get_by_id(self, product_id: int) -> Optional[Product]:
-#         return self.db.query(Product).filter(Product.id == product_id).first()
+    if status:
+        query = query.filter(Product.status == status)
+    if url: 
+        query = query.filter(
+            Product.url.ilike(f"%{url}%")
+        )
+    if search: 
+        query = query.filter(
+            Product.part_no.ilike(f"%{search}%")
+        )
 
-#     def get_by_part(self, part: str) -> Optional[Product]:
-#         return self.db.query(Product).filter(Product.part == part).first()
-
-#     def get_by_url(self, url: str) -> Optional[Product]:
-#         return self.db.query(Product).filter(Product.url == url).first()
-
-#     def get_all(
-#         self,
-#         page: int = 1,
-#         limit: int = 20,
-#         ptype: Optional[str] = None,
-#         stock: Optional[int] = None,
-#         status: Optional[bool] = None
-#     ) -> tuple[list[Product], int]:
-#         query = self.db.query(Product)
-
-#         if ptype:
-#             query = query.filter(Product.ptype == ptype)
-#         if stock is not None:
-#             query = query.filter(Product.stock == stock)
-#         if status is not None:
-#             query = query.filter(Product.status == status)
-
-#         total = query.count()
-#         products = query.offset((page - 1) * limit).limit(limit).all()
-#         return products, total
-
-#     def create(self, data: dict) -> Product:
-#         product = Product(**data)
-#         self.db.add(product)
-#         self.db.commit()
-#         self.db.refresh(product)
-#         return product
-
-#     def update(self, product: Product, data: dict) -> Product:
-#         for key, value in data.items():
-#             setattr(product, key, value)
-#         self.db.commit()
-#         self.db.refresh(product)
-#         return product
-
-#     def delete(self, product: Product) -> None:
-#         self.db.delete(product)
-#         self.db.commit()
-
-#     def bulk_add(self, products: list[Product]) -> None:
-#         self.db.add_all(products)
-#         self.db.commit()
-        
-        
-        
-        
-        
-        
+ 
+    total = query.count() 
+    products = (
+        query.options(
+            load_only(
+               Product.part_no,
+               Product.short_desc, 
+               Product.product_desc,
+               Product.stock,
+               Product.url, 
+               Product.image_url,
+               Product.meta_title, 
+               Product.meta_description, 
+               Product.meta_keywords,
+            ),
+            joinedload(Product.category).load_only(
+                Category.category_id,
+                Category.cat_name,
+            ),
+            joinedload(Product.product_type).load_only(
+                ProductType.product_type_id,
+                ProductType.name,
+            ),
+            joinedload(Product.meta)
+        )
+        .order_by(Product.product_id.desc())
+        .offset((page - 1) * limit)
+        .limit(limit)
+        .all() 
+    )
+    
+    return products, total

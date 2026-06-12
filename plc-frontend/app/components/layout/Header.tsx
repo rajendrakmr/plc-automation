@@ -3,49 +3,57 @@
 import Link from "next/link";
 import Image from "next/image";
 import { resources } from "@/app/data/content";
-import { usePathname } from "next/navigation";
-import SearchSection from "../SearchSection";
+import { usePathname } from "next/navigation"; 
 import BrandMegaMenuSection from "@/app/components/BrandMegaMenuSection";
 import ResourceMegaMenuSection from "@/app/components/ResourceMegaMenuSection";
-import { useEffect, useRef, useState } from "react";
-const popularBrands = [
-  { name: "ABB", image: "/assets/items/abb.webp", url: "/brands/abb" },
-  { name: "Fanuc", image: "/assets/items/abb.webp", url: "/brands/fanuc" },
-  { name: "Indramat", image: "/assets/items/abb.webp", url: "/brands/indramat" },
-  { name: "Mitsubishi", image: "/assets/items/abb.webp", url: "/brands/mitsubishi" },
-  { name: "Schneider", image: "/assets/items/abb.webp", url: "/brands/schneider" },
-  { name: "Siemens", image: "/assets/items/abb.webp", url: "/brands/siemens" },
-  { name: "B&R", image: "/assets/items/abb.webp", url: "/brands/br" },
-];
+import { useState } from "react";
+import { useFetchData } from "@/app/utils/useFetchData"; 
+import ExpandSearchSection from "../main-ui/ExpandSearchSection";
 
-const blogs = [
-  {
-    name: "How PLC Automation Works",
-    image: "/assets/engineering-services-1.jpg",
-    url: "/blog/plc-automation"
-  },
-  {
-    name: "Top 5 Siemens PLC Tips",
-    image: "/assets/engineering-services-2.jpg",
-    url: "/blog/siemens-tips"
-  },
-  {
-    name: "Troubleshooting Drives",
-    image: "/assets/engineering-services-5.jpg",
-    url: "/blog/drives-troubleshooting"
-  },
-  {
-    name: "Industrial IoT Guide",
-    image: "/assets/engineering-services-3.jpg",
-    url: "/blog/iiot-guide"
-  }
-];
+interface Categories {
+  category_id: number;
+  cat_name: string;
+  cat_slug: string;
+}
+
+export interface BlogCategory {
+  blog_cat_id: number;
+  blog_cat_name: string;
+}
+
+export interface Blog {
+  blog_id: number;
+  blog_title: string;
+  blog_meta_title: string;
+  blog_slug: string;
+  blog_meta_desc: string;
+  blog_excerpt: string;
+  blog_meta_keywords: string;
+  blog_content: string;
+  blog_published_at: string | null;
+  blog_img_url: string;
+  blog_author: string;
+  category: BlogCategory;
+}
+
+function truncate(str: string, words = 5) {
+  const w = str.trim().split(/\s+/);
+  return w.length <= words ? str : w.slice(0, words).join(" ") + "...";
+}
 
 
+ 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  const [megaOpen, setMegaOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [open, setOpen] = useState(false); 
+  const { data: BLOGS, loading: BlogLoading } = useFetchData<Blog[]>({
+    url: '/blogs/feature',
+    params: {
+      limit: 6,
+      type: "m"
+    },
+  });
 
   const toggleSubmenu = (menu: string) => {
     setOpenMenu(openMenu === menu ? null : menu);
@@ -55,7 +63,9 @@ export default function Header() {
     setIsOpen(false);
     document.body.style.overflow = "";
   };
-
+  const { data: categories, loading: catLoading } = useFetchData<Categories[]>({
+    url: '/categories/list'
+  });
   const toggleMobileNav = () => {
     setIsOpen((prev) => {
       document.body.style.overflow = !prev ? "hidden" : "";
@@ -63,84 +73,8 @@ export default function Header() {
     });
   };
 
-
-
-  const [open, setOpen] = useState(false);
-
-  const [query, setQuery] = useState("");
-
-  const [loading, setLoading] = useState(false);
-
-  // searched results
-  const [results, setResults] = useState<string[]>([]);
-
-  const wrapperRef = useRef<HTMLDivElement>(null);
-
-  // default suggestions
-  const defaultSuggestions = [
-    "Please try to be as accurate as possible with the part number or description",
-    "We can quote 1000s of parts, here are some popular searches",
-  ];
-
-  // close outside click
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(event.target as Node)
-      ) {
-        setOpen(false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside
-      );
-    };
-  }, []);
-
-  // live search
-  useEffect(() => {
-    if (!query.trim()) {
-      setResults([]);
-      return;
-    }
-
-    setLoading(true);
-
-    const timeout = setTimeout(() => {
-      const filtered = defaultSuggestions.filter((item) =>
-        item.toLowerCase().includes(query.toLowerCase())
-      );
-
-      setResults(filtered);
-
-      setLoading(false);
-    }, 300);
-
-    return () => clearTimeout(timeout);
-  }, [query]);
-
-  // click item
-  const handleSelect = (item: string) => {
-    setQuery(item);
-
-    setOpen(false);
-
-    console.log("Selected:", item);
-
-    // router.push(`/search?q=${item}`)
-  };
-
-  // show matching results if available
-  // otherwise show default suggestions
-  const displayItems =
-    results.length > 0 ? results : defaultSuggestions;
-
+ 
+ 
   return (
     <>
       <div className="topbar">
@@ -195,17 +129,12 @@ export default function Header() {
           </div>
 
           <div className="rk_topbar_right">
-
-            {/* LEFT LINKS */}
             <div className="rk_topbar_links">
               <Link href="/about-us">About Us</Link>
-
               <Link href="/contact-us">Contact Us</Link>
-
               <Link href="/faq">FAQs</Link>
             </div>
 
-            {/* SOCIAL ICONS */}
             <div className="rk_social_icons">
               <Link href="https://www.reddit.com/user/plc_automation_2021/">
                 <i className="fab fa-reddit"></i>
@@ -233,8 +162,6 @@ export default function Header() {
       <div className="site-header-wrap">
         <header className="rk_header_root">
           <div className="header-inner">
-
-            {/* LOGO */}
             <Link className="logo brand-logo" href="/">
               <Image
                 src="/assets/clogo.png"
@@ -244,14 +171,9 @@ export default function Header() {
               />
             </Link>
 
-            {/* NAV */}
             <nav className="rk_nav_wrap">
               <ul className="nav-list">
-
-                {/* LEFT MENU */}
                 <div className="rk_nav_left">
-
-                  {/* MANUFACTURERS */}
                   <li className="nav-item rk_has_mega">
                     <Link
                       className="nav-link"
@@ -262,11 +184,10 @@ export default function Header() {
                         <path d="M0 0l5 6 5-6z" />
                       </svg>
                     </Link>
-
-                    <BrandMegaMenuSection popularBrands={popularBrands} />
+                    <BrandMegaMenuSection popularBrands={categories || []} />
                   </li>
 
-                  {/* RESOURCES */}
+
                   <li className="nav-item rk_has_mega">
                     <Link className="nav-link" href="#">
                       Resources
@@ -274,11 +195,8 @@ export default function Header() {
                         <path d="M0 0l5 6 5-6z" />
                       </svg>
                     </Link>
-
-                    <ResourceMegaMenuSection resources={resources} popularBrands={blogs} />
+                    <ResourceMegaMenuSection resources={resources} />
                   </li>
-
-                  {/* OFFER PRODUCT */}
 
                   {!open &&
                     <li
@@ -298,20 +216,17 @@ export default function Header() {
 
                 {/* RIGHT SEARCH */}
                 <div className="rk_nav_right">
-
-                  <div
+                  <ExpandSearchSection />
+                  {/* <div
                     className={`rk_expand_search ${open ? "active" : ""
                       }`}
                     ref={wrapperRef}
-                  >
-                    {/* ICON */}
+                  > 
                     <div className="rk_expand_search_icon">
                       <svg viewBox="0 0 20 20">
                         <path d="M12.9 14.32a8 8 0 111.41-1.41l5.35 5.33-1.42 1.42-5.33-5.34zm-.82-1.16a6 6 0 10-8.49-8.49 6 6 0 008.49 8.49z" />
                       </svg>
-                    </div>
-
-                    {/* INPUT */}
+                    </div> 
                     <input
                       type="text"
                       placeholder="Search Part Number"
@@ -324,35 +239,31 @@ export default function Header() {
                       className="rk_expand_search_input"
                     />
 
-                    {/* DROPDOWN */}
                     {open && (
                       <div className="rk_expand_dropdown">
-                        {loading ? (
+                        {prdLoading ? (
                           <div className="rk_expand_dropdown_item">
                             Searching...
                           </div>
                         ) : (
                           <>
-                            {results.length > 0 && (
+                            {products.length > 0 && (
                               <div className="rk_expand_dropdown_title">
                                 Matching Results
                               </div>
                             )}
 
                             <ul className="rk_expand_dropdown_list">
-                              {displayItems.map((item, index) => (
+                              {products.map((item, index) => (
                                 <li
-                                  key={index}
-                                  className="rk_expand_dropdown_item"
-                                  onClick={() =>
-                                    handleSelect(item)
-                                  }
+                                  key={item.product_id}
+                                  className="rk_expand_dropdown_item" 
                                 >
                                   <span className="rk_expand_dot">
                                     •
                                   </span>
-
-                                  <span>{item}</span>
+                                  <span>{item.part_no}</span>
+                                  <span>{item.category.cat_name}</span>
                                 </li>
                               ))}
                             </ul>
@@ -360,7 +271,7 @@ export default function Header() {
                         )}
                       </div>
                     )}
-                  </div>
+                  </div> */}
 
 
 
@@ -453,13 +364,13 @@ export default function Header() {
                   }`}
               >
 
-                {popularBrands.map((item) => (
+                {categories?.map((item) => (
                   <Link
-                    key={item.url}
-                    href={item.url}
+                    key={item?.category_id}
+                    href={`/brands/${item.cat_slug}`}
                     onClick={closeMobileNav}
                   >
-                    {item.name}
+                    {item.cat_name}
                   </Link>
                 ))}
 
@@ -481,18 +392,17 @@ export default function Header() {
                 </span>
               </button>
 
-              <div
-                className={`mob-submenu ${openMenu === "resources" ? "open" : ""
-                  }`}
+              <div className={`mob-submenu ${openMenu === "resources" ? "open" : ""
+                }`}
               >
 
-                {blogs.map((item) => (
+                {BLOGS?.map((item) => (
                   <Link
-                    key={item.url}
-                    href={item.url}
+                    key={item.blog_id}
+                    href={`/blog/${item.blog_slug}`}
                     onClick={closeMobileNav}
                   >
-                    {item.name}
+                    {truncate(item.blog_title, 6)}
                   </Link>
                 ))}
 

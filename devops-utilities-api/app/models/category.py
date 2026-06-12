@@ -10,6 +10,7 @@ from sqlalchemy import (
 
 from app.core.database import Base 
 from sqlalchemy.orm import relationship
+
 class Category(Base):
     __tablename__ = "plc_m_categories" 
     category_id = Column(BigInteger,primary_key=True,index=True,autoincrement=True) 

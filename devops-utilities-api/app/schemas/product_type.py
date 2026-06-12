@@ -31,3 +31,9 @@ class ProductTypeResponse(BaseModel):
     description: Optional[str] = None  
     class Config:
         from_attributes = True 
+        
+class ProductType(BaseModel):
+    product_type_id: int 
+    name: str 
+    class Config:
+        from_attributes = True 

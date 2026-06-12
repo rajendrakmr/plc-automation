@@ -57,6 +57,26 @@ class CatPageResponse(BaseModel):
     cat_slug: str 
     class Config:
         from_attributes = True
+
+class CateResp(BaseModel):
+    category_id: int 
+    cat_name: str
+    cat_slug: str
+    cat_desc: str 
+    image_url: str
+    class Config:
+        from_attributes = True
+
+
+class Category(BaseModel):
+    category_id: int 
+    cat_name: str
+    cat_slug: str 
+    class Config:
+        from_attributes = True
+
+
+
         
 class CategoryResponse(BaseModel):
     category_id: int 

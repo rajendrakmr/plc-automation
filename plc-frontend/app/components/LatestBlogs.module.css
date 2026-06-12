@@ -1,0 +1,254 @@
+/* LatestBlogs.module.css */
+
+.rkb_section {
+    background-color: var(--grey);
+    padding: 80px 0;
+}
+
+.rkb_container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 72px;
+}
+
+/* ---------- Header ---------- */
+.rkb_header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.rkb_eyebrow {
+    display: inline-block;
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 12px;
+}
+
+.rkb_heading {
+    font-family: "DM Sans", sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--navy, #1a2c4e);
+    margin: 0 0 14px;
+    line-height: 1.2;
+}
+
+.rkb_subtext {
+    font-family: "DM Sans", sans-serif;
+    font-size: 15px;
+    color: #6b7280;
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* ---------- 3-Col Grid ---------- */
+.rkb_grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+}
+
+/* ---------- Card ---------- */
+.rkb_card {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--blue);
+    transition: box-shadow 0.22s ease, transform 0.22s ease;
+}
+
+.rkb_card:hover {
+    box-shadow: 0 8px 28px rgba(26, 44, 78, 0.1);
+    transform: translateY(-4px);
+    border: 1px solid var(--white);
+}
+
+/* ---------- Image ---------- */
+.rkb_imageWrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.rkb_image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+}
+
+.rkb_card:hover .rkb_image {
+    transform: scale(1.05);
+}
+
+.rkb_badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: var(--blue);
+    color: #fff;
+    font-family: "DM Sans", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 3px 10px;
+    border-radius: 4px;
+}
+
+/* ---------- Card Body ---------- */
+.rkb_cardBody {
+    padding: 22px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.rkb_meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.rkb_dot {
+    color: #d1d5db;
+}
+
+.rkb_cardTitle {
+    font-family: "DM Sans", sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--navy, #1a2c4e);
+    line-height: 1.35;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.rkb_excerpt {
+    font-family: "DM Sans", sans-serif;
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.65;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.rkb_readMore {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--blue);
+    margin-top: auto;
+    transition: gap 0.2s ease;
+}
+
+.rkb_card:hover .rkb_readMore {
+    gap: 9px;
+}
+
+/* ---------- CTA ---------- */
+.rkb_cta {
+    text-align: center;
+    margin-top: 44px;
+}
+
+.rkb_ctaBtn {
+    display: inline-block;
+    font-family: "DM Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--blue);
+    border: 2px solid var(--blue);
+    padding: 11px 36px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.rkb_ctaBtn:hover {
+    background: var(--blue);
+    color: #ffffff;
+}
+
+/* ===================== RESPONSIVE ===================== */
+
+@media (max-width: 1024px) {
+    .rkb_heading {
+        font-size: 30px;
+    }
+}
+
+@media (max-width: 900px) {
+    .rkb_grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .rkb_section {
+        padding: 60px 0;
+    }
+
+    .rkb_heading {
+        font-size: 26px;
+    }
+
+    .rkb_grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .rkb_section {
+        padding: 48px 0;
+    }
+
+    .rkb_grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .rkb_heading {
+        font-size: 22px;
+    }
+
+    .rkb_ctaBtn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .rkb_cardBody {
+        padding: 16px;
+    }
+
+    .rkb_heading {
+        font-size: 20px;
+    }
+}

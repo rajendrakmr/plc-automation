@@ -293,3 +293,99 @@ SELECT
 FROM plc_trn_products p
 INNER JOIN tbl_productmeta pm
     ON pm.pid = p.product_id;
+
+
+
+
+
+
+
+CREATE TABLE plc_m_blog_categories (
+    blog_cat_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    blog_cat_name VARCHAR(255) NOT NULL,
+    blog_cat_slug VARCHAR(255) NOT NULL,
+    status TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_category_slug (blog_cat_slug),
+    INDEX idx_category_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE plc_m_blog_tags (
+    blog_tag_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    blog_tag_name VARCHAR(255) NOT NULL,
+    blog_tag_slug VARCHAR(255) NOT NULL,
+    status TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_blog_tag_slug (blog_tag_slug),
+    INDEX idx_blog_tag_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+
+CREATE TABLE plc_trn_blogs (
+    blog_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ 
+    blog_cat_id BIGINT UNSIGNED NOT NULL, 
+    -- Content
+    blog_title VARCHAR(255) NOT NULL,
+    blog_slug VARCHAR(255) NOT NULL,
+    blog_excerpt VARCHAR(500) DEFAULT NULL,
+    blog_content LONGTEXT DEFAULT NULL,
+
+    -- Media
+    blog_img_url VARCHAR(500) DEFAULT NULL,
+
+    -- Author
+    blog_author VARCHAR(255) DEFAULT NULL,
+
+    -- SEO
+    blog_meta_title VARCHAR(255) DEFAULT NULL,
+    blog_meta_desc VARCHAR(500) DEFAULT NULL,
+    blog_meta_keywords VARCHAR(500) DEFAULT NULL,
+
+    -- Tags (comma separated ya pivot table se manage karo)
+    blog_tags VARCHAR(500) DEFAULT NULL,
+
+    -- Sorting & Status
+    blog_sort INT UNSIGNED NOT NULL DEFAULT 0,
+    status TINYINT(1) NOT NULL DEFAULT 1,
+
+    -- Timestamps
+    blog_published_at TIMESTAMP NULL DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    -- Keys
+    UNIQUE KEY uk_blog_slug (blog_slug),
+    INDEX idx_blog_cat (blog_cat_id),
+    INDEX idx_blog_status (status),
+    INDEX idx_blog_sort (blog_sort),
+
+    -- FK
+    CONSTRAINT fk_blog_category FOREIGN KEY (blog_cat_id)
+        REFERENCES plc_m_blog_categories (blog_cat_id)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+UPDATE `wt_blog` SET `category`='Aerospace & Defense'  WHERE category="Aerospace-and-Defense-"
+CREATE TABLE plc_trn_blog_tag_map (
+    map_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    blog_id BIGINT UNSIGNED NOT NULL,
+    blog_tag_id BIGINT UNSIGNED NOT NULL,
+
+    UNIQUE KEY uk_blog_tag (blog_id, blog_tag_id),
+
+    CONSTRAINT fk_map_blog FOREIGN KEY (blog_id)
+        REFERENCES plc_trn_blogs (blog_id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+
+    CONSTRAINT fk_map_tag FOREIGN KEY (blog_tag_id)
+        REFERENCES plc_m_blog_tags (blog_tag_id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

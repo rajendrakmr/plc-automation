@@ -44,31 +44,3 @@ class Product(Base):
     meta = relationship("ProductMeta", back_populates="product",cascade="all, delete-orphan")
 
     __table_args__ = (Index("idx_product_cat_status", "category_id", "status"), Index("idx_product_created", "created_at"), )
-
-
-# from sqlalchemy import Column, Integer, String, Text, Boolean, TIMESTAMP
-# from sqlalchemy.sql import func
-# from app.core.database import Base
-
-
-# class Product(Base):
-#     __tablename__ = "products" 
-#     id = Column(Integer, primary_key=True, index=True)
-#     part = Column(String(255), nullable=False, index=True)
-#     url = Column(String(255), unique=True, index=True)
-#     mrp = Column(String(50))
-#     price = Column(String(50))
-#     ptype = Column(String(255))
-#     pimage = Column(String(255))
-#     stock = Column(Integer, default=0)
-#     stext = Column(Text)
-#     ftext = Column(Text)
-#     mtag = Column(String(255))
-#     mkey = Column(String(255))
-#     mdesc = Column(Text)
-#     status = Column(Boolean, default=True)
-#     dates = Column(String(50))
-#     ipaddress = Column(String(50))
-#     category_id = Column(Integer, index=True)
-#     subcategory_id = Column(Integer, index=True)
-#     subsubcategory_id = Column(Integer, index=True)

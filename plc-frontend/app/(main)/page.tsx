@@ -1,12 +1,12 @@
- 
-import LatestBlogSection from "@/app/components/LatestBlogSection";
-import BrandPartnerSection from "@/app/components/main-ui/BrandPartnerSection";
-import HomeBannerSection from "@/app/components/HomeBannerSection";
+  
+import Image from "next/image";
+import BrandPartnerSection from "@/app/components/main-ui/BrandPartnerSection"; 
 import ManufacturersSection from "@/app/components/main-ui/ManufacturersSection";
 import ContactUsSection from "@/app/components/ContactUsSection"; 
-import Image from "next/image";
-import HeroBannerSection from "../components/main-ui/HeroBannerSection";
-import TrustBadgeSection from "../components/main-ui/TrustBadgeSection";
+import HeroBannerSection from "@/app/components/main-ui/HeroBannerSection";
+import TrustBadgeSection from "@/app/components/main-ui/TrustBadgeSection";
+import BlogLatestSection from "../components/BlogLatestSection";
+// import BlogLatestSection from "@/app/components/BlogLatestSection";
 
 export const metadata = {
   title: "PLC Automation Group – Your Global Partner for Industrial Automation & PLC Solutions",
@@ -54,8 +54,7 @@ export default function Home() {
         ))} 
 
       </div>
-      <ManufacturersSection />
-
+      <ManufacturersSection /> 
       <BrandPartnerSection />
 
       <section className="section_white_content">
@@ -106,7 +105,7 @@ export default function Home() {
       
 
 
-      <LatestBlogSection />
+      <BlogLatestSection />
       <ContactUsSection />
     </>
   );

@@ -78,6 +78,44 @@ def fetch_products(
             "pages": (total + limit - 1) // limit
         }
     }
+    
+    
+    
+
+
+def fetch_all(
+    db: Session,
+    page: int,
+    limit: int,
+    search: Optional[str] = None,
+    category_id: Optional[int] = None,
+    product_type_id: Optional[int] = None,
+    url: Optional[str] = None,
+    stock: Optional[str] = None,
+    status: Optional[str] = None
+) -> dict:
+
+    products, total = product_repo.list_all(
+    db=db,
+    page=page,
+    limit=limit,
+    search=search,
+    category_id=category_id,
+    product_type_id=product_type_id,
+    url=url,
+    stock=stock,
+    status=status
+)
+
+    return {
+        "records": products,
+        "pagination": {
+            "page": page,
+            "limit": limit,
+            "total": total,
+            "pages": (total + limit - 1) // limit
+        }
+    } 
 # import csv
 # import io
 # from sqlalchemy.orm import Session

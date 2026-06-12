@@ -1,11 +1,43 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import Link from "next/link"; 
+import { useFetchData } from "../utils/useFetchData";
 
-export default function ResourceMegaMenuSection({popularBrands, resources}: {popularBrands: {name: string, image: string, url: string}[], resources?: {name: string, url: string}[]}) {
-    
+export interface BlogCategory {
+    blog_cat_id: number;
+    blog_cat_name: string;
+}
+
+export interface Blog {
+    blog_id: number;
+    blog_title: string;
+    blog_meta_title: string;
+    blog_slug: string;
+    blog_meta_desc: string;
+    blog_excerpt: string;
+    blog_meta_keywords: string;
+    blog_content: string;
+    blog_published_at: string | null;
+    blog_img_url: string;
+    blog_author: string;
+    category: BlogCategory;
+}
+
+function truncate(str: string, words = 5) {
+  const w = str.trim().split(/\s+/);
+  return w.length <= words ? str : w.slice(0, words).join(" ") + "...";
+}
+export default function ResourceMegaMenuSection({ resources }: { resources?: { name: string, url: string }[] }) {
+    const { data: BLOGS, loading: BlogLoading } = useFetchData<Blog[]>({
+        url: '/blogs/feature',
+        params: {
+            limit: 6,
+            type: "m"
+        },
+
+    });
+
     return (
         <div className="rk_mega_dropdown">
             <div className="rk_mega_wrap">
@@ -31,7 +63,7 @@ export default function ResourceMegaMenuSection({popularBrands, resources}: {pop
 
                             <li>
                                 <Link
-                                    href="/brands"
+                                    href="/blogs"
                                     className="rk_mega_view_all"
                                 >
                                     View all Blogs
@@ -47,17 +79,17 @@ export default function ResourceMegaMenuSection({popularBrands, resources}: {pop
                             equipment from leading global manufacturers.
                         </p>
 
-                        <div className="rk_mega_cards_grid">
-                            {popularBrands.slice(0, 6).map((brand) => (
+                        <div className="rk_mega_blogcards_grid">
+                            {BLOGS?.slice(0, 6).map((brand) => (
                                 <Link
-                                    href={brand.url}
-                                    key={brand.url}
+                                    href={`/blog/${brand.blog_slug}`}
+                                    key={brand.blog_id}
                                     className="rk_mega_card"
                                 >
                                     <div className="rk_mega_card_img">
                                         <Image
-                                            src={brand.image}
-                                            alt={brand.name}
+                                            src={`/assets/engineering-services-1.jpg`}
+                                            alt={brand.blog_title}
                                             fill
                                             style={{ objectFit: "cover" }}
                                         />
@@ -65,7 +97,7 @@ export default function ResourceMegaMenuSection({popularBrands, resources}: {pop
 
                                     <div className="rk_mega_card_info">
                                         <span className="rk_mega_card_name">
-                                            {brand.name}
+                                            {truncate(brand.blog_title)}
                                         </span>
 
                                         <span className="rk_mega_card_cta">

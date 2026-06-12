@@ -1,74 +1,55 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
 from app.models.category import Category
 from app.schemas.category import CategoryCreate,CategoryUpdate
-from fastapi import HTTPException, status
 from typing import Optional
+ 
 
-
-# def get_by_part(db: Session, part: str) -> Category | None:
-#     return db.query(Category).filter(Category.part == part).first()
-
-
-# def get_by_slug(db: Session, url: str) -> Category | None:
-#     return db.query(Category).filter(Category.url == url).first()
-
-# def create(db: Session, payload: CategoryCreate) -> Category:
-#     product = Category(**payload.model_dump())
-#     db.add(product)
-#     db.commit()
-#     db.refresh(product)
-#     return product
-
-# def update(db: Session, product_id: int, payload: CategoryUpdate) -> Category:
-#     product = db.query(Category).filter(Category.id == product_id).first()
-#     if not product:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
-#             detail={"errors": {"product_id": "Product not found"}}
-#         )
+def get_all(db:Session,limit,search,category_id,type)->tuple[list[Category], int]:
+    query = db.query(Category)
+    if category_id is not None:
+        query = query.filter(Category.category_id == category_id)
     
-#     for key, value in payload.model_dump(exclude_unset=True).items():
-#         setattr(product, key, value) 
-#     db.commit()
-#     db.refresh(product)
-#     return product
+    # if type:
+    #     type = f"{type.lower()}%"
+    #     query = query.filter(
+    #         Category.type.ilike(search)
+    #     )
+          
+    if search:
+        search = f"{search.lower()}%"
+        query = query.filter(
+            Category.cat_name.ilike(search)
+        )
+        
+    categories = (
+        query
+        .order_by(Category.cat_name.asc()) 
+        .limit(limit)
+        .all()
+    ) 
+    return categories
 
+ALLOWED_CATEGORIES = [
+    "Siemens",
+    "ABB",
+    "Schneider",
+    "Mitsubishi",
+    "Omron",
+    "Yaskawa",
+    "Fanuc",
+    "Allen Bradley",
+    "B&R",
+    "Beckhoff",
+]
 
-
-# def delete(db: Session, product_id: int) -> None:
-#     product = db.query(Category).filter(Category.id == product_id).first()
-#     if not product:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
-#             detail={"errors": {"product_id": "Product not found"}}
-#         )
-    
-#     db.delete(product)
-#     db.commit()
-
-
-def get_all(db:Session)->tuple[list[Category], int]:
-    return db.query(Category).all()
-    
-
-# def get_all(
-#     db: Session,
-#     page: int,
-#     limit: int,
-#     ptype: Optional[str],
-#     stock: Optional[int],
-#     status: Optional[bool]
-# ) -> tuple[list[Category], int]:
-    
-#     query = db.query(Category) 
-#     if ptype is not None:
-#         query = query.filter(Category.ptype == ptype)
-#     if stock is not None:
-#         query = query.filter(Category.stock == stock)
-#     if status is not None:
-#         query = query.filter(Category.status == status)
-
-#     total = query.count()
-#     products = query.offset((page - 1) * limit).limit(limit).all()
-
-#     return products, total
+def get_slug_all(db: Session, limit: str | None = None,search: str | None = None,slug: str | None = None,category_id: str | None = None) -> list[Category]:
+    query = db.query(Category).filter(
+        Category.cat_name.in_(ALLOWED_CATEGORIES)   
+    )
+    if search:
+        query = query.filter(Category.cat_name.ilike(f"{search}%"))
+    if slug:
+        query = query.filter(Category.cat_slug.ilike(f"{slug}%"))
+        
+    return query.order_by(Category.cat_name).all()

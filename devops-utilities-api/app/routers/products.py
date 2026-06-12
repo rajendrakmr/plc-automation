@@ -10,7 +10,8 @@ from app.services.product_service import (
     create_product,
     update_product,
     delete_product,
-    fetch_products
+    fetch_products,
+    fetch_all
     # get_products,
     # get_product,
 )
@@ -64,31 +65,26 @@ def get_all(
 @router.get("/list")
 def product_list(
     page: int = Query(1, ge=1),
-    limit: int = Query(20, ge=1, le=100),
-
+    limit: int = Query(20, ge=1, le=100), 
     search: Optional[str] = None,
     category_id: Optional[int] = None,
-    product_type_id: Optional[int] = None,
-
-    stock: Optional[str] = Query(
-        None,
-        pattern="^(in-stock|limited|out-stock)$"
-    ),
-
+    product_type_id: Optional[int] = None, 
+    url: Optional[str] = None, 
+    stock: Optional[str] = Query( None, pattern="^(in-stock|limited|out-stock)$"  ), 
     status: Optional[str] = Query(
         None,
         pattern="^(draft|published|inactive|archived)$"
-    ),
-
+    ), 
     db: Session = Depends(get_db),
 ):
-    return fetch_products(
+    return fetch_all(
         db=db,
         page=page,
         limit=limit,
         search=search,
         category_id=category_id,
         product_type_id=product_type_id,
+        url=url,
         stock=stock,
         status=status
     )

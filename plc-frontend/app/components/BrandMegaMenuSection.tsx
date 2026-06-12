@@ -1,30 +1,27 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-
-export default function BrandMegaMenuSection({popularBrands}: {popularBrands: {name: string, image: string, url: string}[]}) {
+import Link from "next/link"; 
+export default function BrandMegaMenuSection({popularBrands}: {popularBrands: {category_id: number;
+    cat_name: string;
+    cat_slug: string;}[]}) {
  
     return (
         <div className="rk_mega_dropdown">
             <div className="rk_mega_wrap">
-                <div className="rk_mega_inner">
-
-                    {/* LEFT */}
+                <div className="rk_mega_inner"> 
                     <div className="rk_mega_left">
                         <p className="rk_mega_left_title">
                             Most popular
-                        </p>
-
+                        </p> 
                         <ul className="rk_mega_brand_list">
-                            {popularBrands.map((brand) => (
-                                <li key={brand.url}>
+                            {popularBrands.slice(0, 9).map((brand) => (
+                                <li key={`/brands/${brand.cat_slug}`}>
                                     <Link
-                                        href={brand.url}
+                                        href={`/brands/${brand.cat_slug}`}
                                         className="rk_mega_brand_link"
                                     >
-                                        {brand.name}
+                                        {brand.cat_name}
                                     </Link>
                                 </li>
                             ))}
@@ -48,16 +45,16 @@ export default function BrandMegaMenuSection({popularBrands}: {popularBrands: {n
                         </p>
 
                         <div className="rk_mega_cards_grid">
-                            {popularBrands.slice(0, 6).map((brand) => (
+                            {popularBrands.slice(0, 8).map((brand) => (
                                 <Link
-                                    href={brand.url}
-                                    key={brand.url}
+                                    href={`/brands/${brand.cat_slug}`}
+                                    key={brand.category_id}
                                     className="rk_mega_card"
                                 >
                                     <div className="rk_mega_card_img">
                                         <Image
-                                            src={brand.image}
-                                            alt={brand.name}
+                                            src={"/assets/items/abb.webp"}
+                                            alt={brand.cat_name}
                                             fill
                                             style={{ objectFit: "cover" }}
                                         />
@@ -65,7 +62,7 @@ export default function BrandMegaMenuSection({popularBrands}: {popularBrands: {n
 
                                     <div className="rk_mega_card_info">
                                         <span className="rk_mega_card_name">
-                                            {brand.name}
+                                            {brand.cat_name}
                                         </span>
 
                                         <span className="rk_mega_card_cta">

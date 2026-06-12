@@ -3,9 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # from app.middlewares.logging_middleware import LoggingMiddleware
 # from app.middlewares.context_middleware import ContextMiddleware
 from app.core.config import settings
-from app.routers import auth,users,products,product_type ,category#forms, infos, jobs, products, blogs, search
-# from app.scheduler.log_scheduler import start_log_scheduler
-
+from app.routers import auth,users,products,product_type ,category,blogs 
 app = FastAPI(title=settings.app_name)
 
 origins = [origin.strip() for origin in settings.allowed_origins.split(",") if origin.strip()]
@@ -50,7 +48,8 @@ def check_db_connection(db: Session = Depends(get_db)):
 # )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins or ["*"],
+    allow_origins=[],
+    allow_origin_regex=".*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -74,6 +73,7 @@ async def health_check() -> dict[str, str]:
     return {"status": "ok"}
 
 
+app.include_router(blogs.router, prefix="/api")
 app.include_router(products.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
 app.include_router(users.router, prefix="/api")

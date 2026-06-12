@@ -1,13 +1,10 @@
-import BreadCrumb from "@/app/components/sections/BreadCrumb";
 import "@/app/components/css/product.css";
 import BrandProductList from "@/app/components/BrandProductList";
 import FeatureHighlightsBar from "@/app/components/FeatureHighlightsBar";
 import ContactUsSection from "@/app/components/ContactUsSection";
 import BrandsManufactureSection from "@/app/components/main-ui/BrandsManufactureSection";
 import BrandsDirectory from "@/app/components/BrandsDirectory";
-import ProductBredCrumbs from "@/app/components/main-ui/ProductBredCrumbs";
-import ManufacturersSection from "@/app/components/main-ui/ManufacturersSection";
-import Image from "next/image";
+import ProductBredCrumbs from "@/app/components/main-ui/ProductBredCrumbs"; 
 import PrdHeroBannerSection from "@/app/components/main-ui/PrdHeroBannerSection";
 import TrustBadgeSection from "@/app/components/main-ui/TrustBadgeSection";
 
@@ -46,8 +43,7 @@ export default async function Brands({
           },
         ]}
       />
-      <BrandsManufactureSection />
-      <BrandsDirectory />
+      <BrandsManufactureSection /> 
       <BrandProductList />
       <section className="section_white_content">
         <div className="section_container mmp-container ">
@@ -65,9 +61,7 @@ export default async function Brands({
             <p className="mmp-desc">
               We will find and deliver the parts you need, regardless of their age,
               scarcity or location, to get your facility back up and running swiftly.
-            </p>
-
-            {/* FEATURES */}
+            </p> 
             <div className="mmp-features">
                <TrustBadgeSection />
             </div>

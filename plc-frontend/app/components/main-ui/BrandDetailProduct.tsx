@@ -3,11 +3,15 @@
 import { useState, useEffect } from "react";
 import ProductCard from "@/app/components/ProductCard";
 import { MenuItem, TextField } from "@mui/material";
-import { useGetData } from "../utils/useGetData";
-import { PaginatedResponse } from "./hooks/useFetch";
-import { FetchLoader } from "./FetchLoader";
-import { useFetchData } from "../utils/useFetchData";
-import "./css/BrandsDirectory.css";
+// import { useGetData } from "../utils/useGetData";
+// import { PaginatedResponse } from "./hooks/useFetch";
+// import { FetchLoader } from "./FetchLoader";
+// import { useFetchData } from "../utils/useFetchData";
+import "../css/BrandsDirectory.css";
+import { useFetchData } from "@/app/utils/useFetchData";
+import { PaginatedResponse } from "../hooks/useFetch";
+import { useGetData } from "@/app/utils/useGetData";
+import { FetchLoader } from "../FetchLoader";
 
 
 export interface ProductMeta {
@@ -62,18 +66,22 @@ function useDebounce<T>(value: T, delay = 400): T {
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-export default function BrandProductList() {
+type BrandsDetailProps = {
+    cat_id: number;
+};
+
+const BrandDetailProduct: React.FC<BrandsDetailProps> = ({ cat_id }) => {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(12);
     const [searchInput, setSearchInput] = useState("");
-    const [category_id, setCategoryId] = useState(2);
+    const [category_id, setCategoryId] = useState(cat_id);
     const [activeLetter, setActiveLetter] = useState("A");
 
     const debouncedSearch = useDebounce(searchInput, 400);
     useEffect(() => {
         setPage(1);
-    }, [debouncedSearch]); 
-    
+    }, [debouncedSearch]);
+
     const { data: categories, loading: catLoading } = useFetchData<Categories[]>({
         url: '/categories/list',
         params: {
@@ -98,52 +106,7 @@ export default function BrandProductList() {
 
     return (
         <>
-            <section className="directory">
-                <div className="directory-container">
-                    <h2 className="directory-title">Directory of Manufacturers</h2>
-                    <div className="alphabet-nav">
-                        {alphabet.map((letter) => (
-                            <button
-                                key={letter}
-                                className={`letter-btn ${activeLetter === letter ? "active" : ""}`}
-                                onClick={() => setActiveLetter(letter)}
-                            >
-                                {letter}
-                            </button>
-                        ))}
-                    </div>
-                    <select
-                        className="letter-select"
-                        value={activeLetter}
-                        onChange={(e) => setActiveLetter(e.target.value)}
-                    >
-                        {alphabet.map((letter) => (
-                            <option key={letter} value={letter}>{letter}</option>
-                        ))}
-                    </select>
 
-                    <div className="directory-header">
-                        <div>
-                            <h3>{activeLetter}</h3>
-                            <span className="underline"></span>
-                        </div>
-                    </div>
-                    <div className="manufacturer-grid">
-                        {catLoading ? (
-                            <p className="empty-state">Loading...</p>
-                        ) : categories && categories.length > 0 ? (
-                            categories.map((cat) => (
-                                <div key={cat.category_id} onClick={() => setCategoryId(cat.category_id)} className="manufacturer-card">
-                                    {cat.cat_name}
-                                </div>
-                            ))
-                        ) : (
-                            <p className="empty-state">No manufacturers found.</p>
-                        )}
-                    </div>
-
-                </div>
-            </section>
             <section className="section_grey_content">
                 <div className="section_container product-container">
                     <div className="product-list">
@@ -188,9 +151,9 @@ export default function BrandProductList() {
 
                         <div style={{ position: "relative", minHeight: "200px" }}>
                             <FetchLoader show={isLoading} />
-                            <ProductCard products={products} />
+                            <ProductCard products={products || []} />
                         </div>
-                        {!isLoading && products.length === 0 && (
+                        {!isLoading && products && products.length === 0 && (
                             <div className="no-products">No products found.</div>
                         )}
 
@@ -247,3 +210,5 @@ export default function BrandProductList() {
         </>
     );
 }
+
+export default BrandDetailProduct;

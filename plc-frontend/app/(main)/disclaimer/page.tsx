@@ -20,8 +20,8 @@ export default function Disclaimer() {
                 ]}
             />
 
-            <section className="pd-section">
-                <div className="pd-inner">
+            <section className="section_grey_content">
+                <div className="section_container"  style={{paddingTop:"0px"}}>
 
                     {/* LEFT */}
                     <div className="pd-left">
@@ -34,36 +34,7 @@ export default function Disclaimer() {
 
                     </div>
 
-                    {/* RIGHT (RFQ FORM) */}
-                    <div className="pd-right">
-                        <div className="rfq-card">
-                            <h3>
-                                Lets Get In Touch
-                            </h3>
-
-                            <form className="rfq-form">
-                                <input placeholder="Name" />
-                                <input placeholder="Company Name" />
-
-                                <div className="phone-group">
-                                    <select>
-                                        <option>Singapore (+65)</option>
-                                        <option>India (+91)</option>
-                                    </select>
-                                    <input placeholder="Phone Number" />
-                                </div>
-
-                                <input placeholder="Email" />
-                                <textarea placeholder="Message"></textarea>
-
-                                <button type="submit">Enquiry Us</button>
-                            </form>
-
-                            <p className="privacy">
-                                For more information on how your data is processed, read our privacy policy.
-                            </p>
-                        </div>
-                    </div>
+                     
 
                 </div>
             </section>

@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import BreadCrumb from "@/app/components/sections/BreadCrumb";
 import ContactUsSection from "@/app/components/ContactUsSection";
-import FeatureHighlightsBar from "@/app/components/FeatureHighlightsBar";
 import Image from "next/image";
 import Link from "next/link";
 import "@/app/components/css/product.css";
@@ -13,8 +11,6 @@ import DeliverySection from "@/app/components/main-ui/DeleverySection";
 import ServiceSection from "@/app/components/main-ui/ServiceSection";
 import BreadCrumbsSection from "@/app/components/BredCrumbsSection";
 import FaqSection from "@/app/components/main-ui/FAQSection";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
 import QuoteForm from "@/app/components/main-ui/QuoteForm";
 import PrdHeroBannerSection from "@/app/components/main-ui/PrdHeroBannerSection";
 import TrustBadgeSection from "@/app/components/main-ui/TrustBadgeSection";
@@ -32,9 +28,7 @@ export default function ProductDetailsClient({
 
     useEffect(() => {
         const el = quoteFormRef.current;
-
         if (!el) return;
-
         const observer = new IntersectionObserver(
             ([entry]) => {
                 setShowSticky(!entry.isIntersecting);
@@ -43,9 +37,7 @@ export default function ProductDetailsClient({
                 threshold: 0.1,
             }
         );
-
         observer.observe(el);
-
         return () => {
             observer.unobserve(el);
             observer.disconnect();
@@ -66,28 +58,15 @@ export default function ProductDetailsClient({
             setShowSticky(rect.bottom < 0);
         };
 
-        window.addEventListener(
-            "scroll",
-            handleScroll
-        );
-
+        window.addEventListener("scroll", handleScroll);
         handleScroll();
 
-        return () =>
-            window.removeEventListener(
-                "scroll",
-                handleScroll
-            );
+        return () => window.removeEventListener("scroll", handleScroll);
     }, []);
-
     const scrollToSection = (id: string) => {
         const el = document.getElementById(id);
-
         if (el) {
-            el.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-            });
+            el.scrollIntoView({ behavior: "smooth", block: "start", });
         }
     };
     return (
@@ -124,11 +103,13 @@ export default function ProductDetailsClient({
                     <div className="pd-left">
                         <h1 className="pd-code">
                             {product.part_no}
-                        </h1>
-
-                        <h2 className="pd-title">
-                            {/* {product.name} */}
-                        </h2>
+                        </h1> 
+                         {
+                            product.short_desc && <p
+                                className="pd-title"
+                                dangerouslySetInnerHTML={{ __html: product.short_desc }}
+                            />
+                        }
 
                         <div className="pd-badges">
                             <div className="google-review">

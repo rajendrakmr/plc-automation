@@ -1,6 +1,7 @@
 "use client";
 
 import { useFetch, PaginatedResponse } from "@/app/components/hooks/useFetch";
+import { truncate } from "@/app/utils/helper";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -23,6 +24,27 @@ interface FilterState {
   stock: string;
 }
 
+
+export interface BlogCategory {
+  blog_cat_id: number;
+  blog_cat_name: string;
+}
+
+export interface Blog {
+  blog_id: number;
+  blog_title: string;
+  blog_meta_title: string;
+  blog_slug: string;
+  blog_meta_desc: string;
+  blog_excerpt: string;
+  blog_meta_keywords: string;
+  blog_content: string;
+  blog_published_at: string | null;
+  blog_img_url: string;
+  blog_author: string;
+  category: BlogCategory;
+}
+
 type SortDir = "asc" | "desc";
 type ActiveTab = "all" | "published" | "trash";
 
@@ -30,9 +52,9 @@ type ActiveTab = "all" | "published" | "trash";
 
 function StockBadge({ stock }: { stock: Product["stock"] }) {
   const map = {
-    "in-stock":     { label: "In Stock",     cls: "badge-in"  },
-    limited:        { label: "Limited",       cls: "badge-low" },
-    "out-of-stock": { label: "Out of Stock",  cls: "badge-out" },
+    "in-stock": { label: "In Stock", cls: "badge-in" },
+    limited: { label: "Limited", cls: "badge-low" },
+    "out-of-stock": { label: "Out of Stock", cls: "badge-out" },
   } as const;
   const { label, cls } = map[stock] ?? map["out-of-stock"];
   return <span className={`badge-stock ${cls}`}>{label}</span>;
@@ -46,32 +68,32 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function ProductsPage() {
-  const [page, setPage]               = useState(1);
-  const [limit, setLimit]             = useState(10);
-  const [activeTab, setActiveTab]     = useState<ActiveTab>("all");
-  const [sortKey, setSortKey]         = useState<keyof Product | null>(null);
-  const [sortDir, setSortDir]         = useState<SortDir>("asc");
-  const [selected, setSelected]       = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [activeTab, setActiveTab] = useState<ActiveTab>("all");
+  const [sortKey, setSortKey] = useState<keyof Blog | null>(null);
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [filterVisible, setFilterVisible] = useState(true);
-  const [refreshing, setRefreshing]   = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const [filters, setFilters]         = useState<FilterState>({ search: "", type: "", category: "", stock: "" });
+  const [filters, setFilters] = useState<FilterState>({ search: "", type: "", category: "", stock: "" });
   const [pendingFilters, setPendingFilters] = useState<FilterState>({ search: "", type: "", category: "", stock: "" });
 
   // ── Real API fetch ──────────────────────────────────────────────────────────
   const { loading, error, data, total, totalPages, refetch } =
-    useFetch<PaginatedResponse<Product>>({
-      url: "/products",
+    useFetch<PaginatedResponse<Blog>>({
+      url: "/blogs",
       params: {
         page,
         limit,
-        search:   filters.search   || undefined,
-        type:     filters.type     || undefined,
+        search: filters.search || undefined,
+        type: filters.type || undefined,
         category: filters.category || undefined,
-        stock:    filters.stock    || undefined,
-        sort:     sortKey          ?? undefined,
-        dir:      sortDir,
-        tab:      activeTab,
+        stock: filters.stock || undefined,
+        sort: sortKey ?? undefined,
+        dir: sortDir,
+        tab: activeTab,
       },
     });
 
@@ -86,15 +108,15 @@ export default function ProductsPage() {
 
   const pageNumbers = useMemo(() => {
     const start = Math.max(1, page - 2);
-    const end   = Math.min(totalPages, start + 4);
+    const end = Math.min(totalPages, start + 4);
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }, [page, totalPages]);
 
   const allSelected =
-    products.length > 0 && products.every((p) => selected.has(p.part_no));
+    products.length > 0 && products.every((p) => selected.has(p.blog_slug));
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
-  const handleSort = (key: keyof Product) => {
+  const handleSort = (key: keyof Blog) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortKey(key); setSortDir("asc"); }
     setPage(1);
@@ -116,7 +138,7 @@ export default function ProductsPage() {
   };
 
   const handleSelectAll = (checked: boolean) => {
-    setSelected(checked ? new Set(products.map((p) => p.part_no)) : new Set());
+    setSelected(checked ? new Set(products.map((p) => p.blog_slug)) : new Set());
   };
 
   const handleSelectRow = (id: string, checked: boolean) => {
@@ -143,103 +165,22 @@ export default function ProductsPage() {
     console.log("Row action:", action, partNo);
     refetch();
   };
-const router = useRouter();
-    const handleRowEditAction = (row: any) => {
+  const router = useRouter();
+  const handleRowEditAction = (row: any) => {
     // console.log("Row action:", action, partNo);
     // refetch();
-      sessionStorage.setItem("product-edit", JSON.stringify(row));
+    sessionStorage.setItem("blog-edit", JSON.stringify(row));
 
-  router.push("/admin/products/edit?mode=edit");
+    router.push("/admin/blogs/edit?mode=edit");
   };
 
   // ── Render ───────────────────────────────────────────────────────────────────
   return (
     <>
-      <style>{`
-        .products-page { background: #637b7b; padding: 1.5rem; max-width: 1100px; margin: 0 auto; font-family: 'DM Sans', sans-serif; }
-        .rk_topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; gap: 12px; flex-wrap: wrap; }
-        .rk_topbar-left { display: flex; align-items: center; gap: 10px; }
-        .page-title { font-size: 18px; font-weight: 600; color: #fff; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-        .badge-info { background: #dbeafe; color: #1e40af; }
-        .badge-success { background: #dcfce7; color: #14532d; }
-        .badge-danger { background: #fee2e2; color: #7f1d1d; }
-        .rk_topbar-right { display: flex; align-items: center; gap: 8px; }
-        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #1e293b; transition: background 0.15s, border-color 0.15s; font-family: inherit; }
-        .btn:hover { background: #f8fafc; border-color: #cbd5e1; }
-        .btn-icon { width: 34px; height: 34px; padding: 0; justify-content: center; }
-        .btn-primary { background: #0d9488; color: #f8fafc; border-color: #1e293b; }
-        .btn-primary:hover { background: #0f172a; }
-        .btn-danger { color: #dc2626; border-color: #fca5a5; }
-        .btn-danger:hover { background: #fee2e2; }
-        .spin { animation: spin 0.6s linear infinite; display: inline-block; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .filter-bar { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; margin-bottom: 1rem; display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
-        .filter-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 130px; }
-        .filter-group label { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
-        .filter-group input, .filter-group select { height: 36px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0 10px; font-size: 13px; background: #f8fafc; color: #1e293b; outline: none; width: 100%; font-family: inherit; transition: border-color 0.15s; }
-        .filter-group input:focus, .filter-group select:focus { border-color: #3b82f6; background: #fff; }
-        .filter-group.search-wrap { position: relative; flex: 2; min-width: 180px; }
-        .filter-group.search-wrap input { padding-left: 34px; }
-        .search-icon { position: absolute; left: 10px; top: 8px; color: #94a3b8; font-size: 15px; pointer-events: none; }
-        .filter-actions { display: flex; gap: 8px; align-self: flex-end; }
-        .tabs { display: flex; gap: 4px; margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
-        .tab { padding: 8px 16px; border-radius: 8px 8px 0 0; font-size: 13px; cursor: pointer; border: 1px solid transparent; border-bottom: none; color: #64748b; background: transparent; transition: all 0.15s; font-family: inherit; font-weight: 500; position: relative; bottom: -1px; }
-        .tab.active { background: #fff; border-color: #e2e8f0; border-bottom-color: #fff; color: #1e293b; }
-        .tab:hover:not(.active) { background: #f1f5f9; color: #1e293b; }
-        .tab-badge { margin-left: 6px; }
-        .table-wrap { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
-        .bulk-bar { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: #eff6ff; border-bottom: 1px solid #bfdbfe; font-size: 13px; }
-        .bulk-bar-text { color: #1e40af; font-weight: 500; }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        thead tr { border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
-        thead th { padding: 10px 14px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; text-align: left; cursor: pointer; user-select: none; white-space: nowrap; }
-        thead th:hover { color: #1e293b; }
-        thead th.no-sort { cursor: default; }
-        .sort-icon { opacity: 0.35; font-size: 11px; margin-left: 3px; }
-        .sort-icon.active { opacity: 1; color: #3b82f6; }
-        tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.1s; }
-        tbody tr:last-child { border-bottom: none; }
-        tbody tr:hover { background: #f8fafc; }
-        tbody tr.row-selected { background: #eff6ff; }
-        td { padding: 11px 14px; font-size: 13px; color: #1e293b; vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .col-check { width: 40px; }
-        .col-part { width: 160px; }
-        .col-type { width: 120px; }
-        .col-cat { width: 130px; }
-        .col-stock { width: 115px; }
-        .col-actions { width: 120px; text-align: right; }
-        input[type="checkbox"] { width: 15px; height: 15px; cursor: pointer; accent-color: #3b82f6; }
-        .part-no { font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #3b82f6; }
-        .type-pill { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
-        .badge-stock { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-        .badge-stock::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-        .badge-in  { background: #dcfce7; color: #14532d; } .badge-in::before  { background: #16a34a; }
-        .badge-low { background: #fef9c3; color: #713f12; } .badge-low::before { background: #ca8a04; }
-        .badge-out { background: #fee2e2; color: #7f1d1d; } .badge-out::before { background: #dc2626; }
-        .action-btn { background: none; border: none; cursor: pointer; padding: 5px 6px; border-radius: 6px; color: #94a3b8; font-size: 14px; transition: background 0.12s, color 0.12s; }
-        .action-btn:hover { background: #f1f5f9; color: #1e293b; }
-        .action-btn.danger:hover { background: #fee2e2; color: #dc2626; }
-        .table-footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-top: 1px solid #e2e8f0; flex-wrap: wrap; gap: 10px; background: #f8fafc; }
-        .page-info { font-size: 12px; color: #64748b; }
-        .page-info strong { color: #1e293b; }
-        .pagination { display: flex; align-items: center; gap: 4px; }
-        .pg-btn { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid #e2e8f0; background: #fff; cursor: pointer; font-size: 12px; font-weight: 500; color: #1e293b; transition: background 0.12s; font-family: inherit; }
-        .pg-btn:hover:not(:disabled):not(.pg-active) { background: #f1f5f9; }
-        .pg-btn.pg-active { background: #1e293b; color: #fff; border-color: #1e293b; }
-        .pg-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-        .limit-select { height: 30px; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0 8px; font-size: 12px; background: #fff; color: #1e293b; font-family: inherit; }
-        .empty-state { text-align: center; padding: 48px 20px; color: #94a3b8; font-size: 13px; }
-        .empty-icon { font-size: 32px; margin-bottom: 8px; }
-        .loading-overlay { opacity: 0.5; pointer-events: none; }
-        .error-msg { padding: 12px 16px; background: #fee2e2; color: #7f1d1d; font-size: 13px; border-bottom: 1px solid #fca5a5; }
-      `}</style>
-
       <div className="products-page">
-        {/* ── Top Bar ── */}
         <div className="rk_topbar">
           <div className="rk_topbar-left">
-            <span className="page-title">Products</span>
+            <span className="page-title">Blogs</span>
             <span className="badge badge-info">{total}</span>
           </div>
           <div className="rk_topbar-right">
@@ -252,60 +193,52 @@ const router = useRouter();
                 <span className="badge badge-info" style={{ marginLeft: 2 }}>{activeFilterCount}</span>
               )}
             </button>
-            <Link href={'/admin/products/add'} className="btn btn-primary" onClick={() => console.log("Navigate to /admin/products/add")}>
-              + Add Product
+            <Link href={'/admin/blogs/add'} className="btn btn-primary" onClick={() => console.log("Navigate to /admin/products/add")}>
+              + Add Blog
             </Link>
           </div>
         </div>
 
         {/* ── Filter Bar ── */}
         {filterVisible && (
-          <div className="filter-bar">
-            <div className="filter-group search-wrap">
-              <label>Search</label>
-              <span className="search-icon">🔍</span>
-              <input
-                type="text"
-                placeholder="Part no, description..."
-                value={pendingFilters.search}
-                onChange={(e) => setPendingFilters((f) => ({ ...f, search: e.target.value }))}
-                onKeyDown={(e) => e.key === "Enter" && handleApplyFilters()}
-              />
+          <>
+            <div className="filter-bar">
+              <div className="filter-group search-wrap">
+                <label>Search</label>
+                <span className="search-icon">🔍</span>
+                <input
+                  type="text"
+                  placeholder="Search by blog title, description..."
+                  value={pendingFilters.search}
+                  onChange={(e) => setPendingFilters((f) => ({ ...f, search: e.target.value }))}
+                  onKeyDown={(e) => e.key === "Enter" && handleApplyFilters()}
+                />
+              </div>
+              <div className="filter-group">
+                <label>Category</label>
+                <select value={pendingFilters.category} onChange={(e) => setPendingFilters((f) => ({ ...f, category: e.target.value }))}>
+                  <option value="">All Categories</option>
+                  <option>Sensors</option>
+                  <option>Actuators</option>
+                  <option>Connectors</option>
+                  <option>Valves</option>
+                </select>
+              </div>
+              <div className="filter-group">
+                <label>Stock Status</label>
+                <select value={pendingFilters.stock} onChange={(e) => setPendingFilters((f) => ({ ...f, stock: e.target.value }))}>
+                  <option value="">All</option>
+                  <option value="in-stock">In Stock</option>
+                  <option value="limited">Limited</option>
+                  <option value="out-of-stock">Out of Stock</option>
+                </select>
+              </div>
             </div>
-            <div className="filter-group">
-              <label>Product Type</label>
-              <select value={pendingFilters.type} onChange={(e) => setPendingFilters((f) => ({ ...f, type: e.target.value }))}>
-                <option value="">All Types</option>
-                <option>Electronic</option>
-                <option>Mechanical</option>
-                <option>Hydraulic</option>
-                <option>Pneumatic</option>
-              </select>
-            </div>
-            <div className="filter-group">
-              <label>Category</label>
-              <select value={pendingFilters.category} onChange={(e) => setPendingFilters((f) => ({ ...f, category: e.target.value }))}>
-                <option value="">All Categories</option>
-                <option>Sensors</option>
-                <option>Actuators</option>
-                <option>Connectors</option>
-                <option>Valves</option>
-              </select>
-            </div>
-            <div className="filter-group">
-              <label>Stock Status</label>
-              <select value={pendingFilters.stock} onChange={(e) => setPendingFilters((f) => ({ ...f, stock: e.target.value }))}>
-                <option value="">All</option>
-                <option value="in-stock">In Stock</option>
-                <option value="limited">Limited</option>
-                <option value="out-of-stock">Out of Stock</option>
-              </select>
-            </div>
-            <div className="filter-actions">
+            <div className=" filter-actions" style={{ paddingBottom: "3px" }}>
               <button className="btn" onClick={handleClearFilters}>Clear</button>
               <button className="btn btn-primary" onClick={handleApplyFilters}>Apply</button>
             </div>
-          </div>
+          </>
         )}
 
         {/* ── Tabs ── */}
@@ -344,21 +277,21 @@ const router = useRouter();
                   <th className="col-check no-sort">
                     <input type="checkbox" checked={allSelected} onChange={(e) => handleSelectAll(e.target.checked)} aria-label="Select all" />
                   </th>
-                  <th className="col-part" onClick={() => handleSort("part_no")}>
-                    Part No <SortIcon active={sortKey === "part_no"} dir={sortDir} />
+                  <th className="col-part" onClick={() => handleSort("blog_title")}>
+                    Title <SortIcon active={sortKey === "blog_title"} dir={sortDir} />
                   </th>
-                  <th className="col-type" onClick={() => handleSort("product_type")}>
-                    Type <SortIcon active={sortKey === "product_type"} dir={sortDir} />
-                  </th>
+                  {/* <th className="col-type" onClick={() => handleSort("blog_excerpt")}>
+                    Content <SortIcon active={sortKey === "blog_excerpt"} dir={sortDir} />
+                  </th> */}
                   <th className="col-cat" onClick={() => handleSort("category")}>
                     Category <SortIcon active={sortKey === "category"} dir={sortDir} />
                   </th>
-                  <th onClick={() => handleSort("short_desc")}>
+                  {/* <th onClick={() => handleSort("short_desc")}>
                     Description <SortIcon active={sortKey === "short_desc"} dir={sortDir} />
                   </th>
                   <th className="col-stock" onClick={() => handleSort("stock")}>
                     Stock <SortIcon active={sortKey === "stock"} dir={sortDir} />
-                  </th>
+                  </th> */}
                   <th className="col-actions no-sort" />
                 </tr>
               </thead>
@@ -373,24 +306,24 @@ const router = useRouter();
                     </td>
                   </tr>
                 ) : (
-                  products.map((product) => (
-                    <tr key={product.part_no} className={selected.has(product.part_no) ? "row-selected" : ""}>
+                  products.map((item) => (
+                    <tr key={item.blog_id} className={selected.has(item.blog_slug) ? "row-selected" : ""}>
                       <td className="col-check">
                         <input
                           type="checkbox"
-                          checked={selected.has(product.part_no)}
-                          onChange={(e) => handleSelectRow(product.part_no, e.target.checked)}
-                          aria-label={`Select ${product.part_no}`}
+                          checked={selected.has(item.blog_slug)}
+                          onChange={(e) => handleSelectRow(item.blog_slug, e.target.checked)}
+                          aria-label={`Select ${item.blog_id}`}
                         />
                       </td>
-                      <td className="col-part"><span className="part-no">{product.part_no}</span></td>
-                      <td className="col-type"><span className="type-pill">{product.product_type.name}</span></td>
-                      <td className="col-cat">{product.category.cat_name}</td>
-                      <td title={product.short_desc}>{product.short_desc}</td>
-                      <td className="col-stock"><StockBadge stock={product.stock} /></td>
+                      <td className="col-part"><span className="part-no">{item.blog_title}</span></td>
+                      {/* <td className="col-type">{truncate(item.blog_excerpt,5)}</td> */}
+                      <td className="col-cat"><span className="type-pill">{item.category.blog_cat_name}</span></td>
+                      {/* <td title={item.short_desc}>{item.short_desc}</td>
+                      <td className="col-stock"><StockBadge stock={item.stock} /></td> */}
                       <td className="col-actions">
-                        <button className="action-btn" title="Edit" aria-label={`Edit ${product.part_no}`} onClick={() => handleRowEditAction(product)}>✏️</button>
-                        <button className="action-btn danger" title="Trash" aria-label={`Trash ${product.part_no}`} onClick={() => handleRowAction("trash", product.part_no)}>🗑️</button>
+                        <button className="action-btn" title="Edit" aria-label={`Edit ${item.blog_id}`} onClick={() => handleRowEditAction(item)}>✏️</button>
+                        <button className="action-btn danger" title="Trash" aria-label={`Trash ${item.blog_id}`} onClick={() => handleRowAction("trash", item.blog_slug)}>🗑️</button>
                       </td>
                     </tr>
                   ))

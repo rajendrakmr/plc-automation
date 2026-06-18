@@ -22,11 +22,10 @@ export default function PrivacyPolicy() {
             />
 
             <section className="section_grey_content">
-                <div className="section_container pd-inner">
+                <div className="section_container"  style={{paddingTop:"0px"}}>
 
                     {/* LEFT */}
-                    <div className="pd-left">
-
+                    <div className="pd-left"> 
                         <h1 className="pd-code">COLLECTION OF PERSONAL INFORMATION</h1>
 
                         <p className="desc">
@@ -49,7 +48,7 @@ export default function PrivacyPolicy() {
                     </div>
 
                     {/* RIGHT (RFQ FORM) */}
-                    <div className="pd-right">
+                    {/* <div className="pd-right">
                         <div className="rfq-card">
                             <h3>
                                 Lets Get In Touch
@@ -77,7 +76,7 @@ export default function PrivacyPolicy() {
                                 For more information on how your data is processed, read our privacy policy.
                             </p>
                         </div>
-                    </div>
+                    </div> */}
 
                 </div>
             </section>

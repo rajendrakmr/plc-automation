@@ -1,34 +1,8 @@
-import BredCrumbsSection from "@/app/components/BredCrumbsSection";
-import Image from "next/image"; 
-import ContactUsSection from "@/app/components/ContactUsSection";
-import "@/app/components/css/blogs.css";
-import Reference from "@/app/components/main-ui/Reference"; 
-import { notFound } from "next/navigation"; 
-import PopularBlogSection from "@/app/components/PopularBlogSection";
- 
-const categories = [
-    "PLC Basics",
-    "Siemens PLC",
-    "Automation",
-    "Industrial IoT",
-    "HMI Systems",
-];
 
-const tags = [
-    "S7-1200",
-    "Siemens",
-    "PLC",
-    "Automation",
-    "Industry 4.0",
-];
- 
-type Props = {
-    params: Promise<{
-        blog: string;
-    }>;
-};
-
-
+import { notFound } from "next/navigation";
+import BlogDetail from "./BlogDetail";
+import { Metadata } from "next";
+import { PaginatedResponse } from "@/app/components/hooks/useFetch";
 export interface BlogCategory {
     blog_cat_id: number;
     blog_cat_name: string;
@@ -49,83 +23,54 @@ export interface Blog {
     category: BlogCategory;
 }
 
-export default async function BlogDetails({
-    params,
-}: Props) {
-    const { blog: blogSlug } = await params;
-    let blog: Blog | null = null;
+type Props = {
+    params: Promise<{
+        blog: string;
+    }>;
+};
 
+function stripHtml(html: string): string {
+    return html.replace(/<[^>]*>/g, "").trim();
+}
+async function getBlog(blog: string): Promise<PaginatedResponse<Blog> | null> {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blogs/feature?limit=1&url=${blogSlug}`, { cache: "no-store" });
-        if (!res.ok) notFound();
-        const blogs: Blog[] = await res.json();
-        blog = blogs[0] ?? null;
-
-        if (!blog) notFound();
-
+        const apiEndPoint = `${process.env.NEXT_PUBLIC_API_URL}/blogs/list?url=${blog}`
+        const res = await fetch(apiEndPoint, { cache: "no-store" });
+        if (!res.ok) return null;
+        const data: PaginatedResponse<Blog> = await res.json();
+        if (!data?.records?.length) return null;
+        return data;
     } catch {
-        notFound();
+        return null;
+    }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { blog } = await params;
+    const blogs = await getBlog(blog);
+
+    const blogData = blogs?.records?.[0];
+    console.log("blogDatablogDatablogDatablogData", blogData)
+
+    if (!blogData) {
+        return {
+            title: "blog Not Found",
+            description: "",
+        };
     }
 
-    return (
-        <main>
+    return {
+        title: blogData.blog_title,
+        description: blogData.blog_title,
+        keywords: blogData.blog_title,
+    };
+}
 
-            <BredCrumbsSection
-                title={blog.blog_title}
-                bgImage="/assets/engineering-services-1.jpg"
-                items={[
-                    { label: "Home", link: "/" },
-                    { label: "Blogs", link: "/blogs" },
-                    { label: blog.category.blog_cat_name },
-                ]}
-            />
-
-            <section className="section_grey_content">
-
-                <div className="section_container blogx_container" style={{ paddingTop: "0px" }}>
-
-                    {/* LEFT */}
-                    <div className="blogx_left">
-
-                        <Image
-                            src="/assets/engineering-services-4.jpg"
-                            alt={blog.blog_title}
-                            width={900}
-                            height={450}
-                            className="blogx_main_img"
-                        />
-
-                        <div className="blogx_meta">
-                            <span>{blog.category.blog_cat_name}</span>
-                            <span>By {blog.blog_author}</span>
-                            {/* <span>{blog.date}</span> */}
-                        </div>
-
-                        <h1 className="blogx_title">{blog.blog_title}</h1>
-
-                        <div className="blogx_content">
-
-                            {
-                                blog.blog_content && <div
-                                    // className="product_desc"
-                                    dangerouslySetInnerHTML={{ __html: blog.blog_content }}
-                                />
-                            }
-                        </div>
-
-                    </div>
-
-                    {/* RIGHT SIDEBAR */}
-                   
-                        <PopularBlogSection />
-
-
-                </div>
-
-            </section>
-            <Reference />
-            <ContactUsSection />
-
-        </main>
-    );
+export default async function Blog({ params }: Props) {
+    
+    const { blog } = await params;
+    const blogs = await getBlog(blog);
+    if (!blogs) notFound();
+    const blogData = blogs.records[0];
+    return <BlogDetail blog={blogData} />;
 }

@@ -3,13 +3,17 @@ from sqlalchemy.orm import Session
 from typing import Optional
 from app.core.database import get_db
 from app.core.dependencies import get_current_user
-# from app.models.users import User
+from app.models.users import User
+from app.schemas.blog_schema import BlogCreate,BlogResponse,BlogUpdate
 # from app.schemas.products import ProductCreate, ProductUpdate, ProductResponse 
 from app.services.blog_service import (
     fetch_all,
     all_feature,
     all_tags,
-    all_cat
+    all_cat,
+    create_blog,
+    all,
+    update_blog,
     # create_product,
     # update_product,
     # delete_product,
@@ -19,7 +23,6 @@ from app.services.blog_service import (
 )
 
 router = APIRouter(prefix="/blogs", tags=["Blogs"])
-
 
 
 @router.get("/list")
@@ -33,6 +36,23 @@ def blog_list(
     db: Session = Depends(get_db),
 ):
     return fetch_all( db,page,limit,search,blog_cat_id,url,status)
+ 
+ 
+
+
+
+@router.get("/")
+def get_all(
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100), 
+    search: Optional[str] = None,
+    blog_cat_id: Optional[int] = None, 
+    url: Optional[str] = None,  
+    status: Optional[int] = None , 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return all( db,page,limit,search,blog_cat_id,url,status)
  
  
  
@@ -68,22 +88,23 @@ def cat_list(
  
 
 
-# # ─── CREATE ───────────────────────────────────────────────
-# @router.post("/", response_model=ProductResponse)
-# def create( 
-#     payload: ProductCreate,
-#     db: Session = Depends(get_db),
-#     current_user: User = Depends(get_current_user)
-# ):
-#     return create_product(db, payload)
+# ─── CREATE ───────────────────────────────────────────────
+@router.post("/", response_model=BlogResponse)
+def create( 
+    payload: BlogCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return create_blog(db, payload)
 
-# @router.patch("/{product_id}", response_model=ProductResponse)
-# def update(
-#     product_id: int,
-#     payload: ProductUpdate,
-#     db: Session = Depends(get_db),
-# ):
-#     return update_product(db, product_id, payload)
+@router.patch("/{blog_id}", response_model=BlogResponse)
+def update(
+    blog_id: int,
+    payload: BlogUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return update_blog(db, blog_id, payload)
 
 
 # @router.delete("/{product_id}")

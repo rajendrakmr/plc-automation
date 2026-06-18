@@ -6,14 +6,12 @@ CONFIG_DIR = Path(__file__).parent
 PROJECT_ROOT = CONFIG_DIR.parent
 LOG_DIR = PROJECT_ROOT / "logs"
 
-
 class Settings(BaseSettings):
     # App
     app_name: str = "PLC Backend"
     environment: str = "development"
     debug: bool = False
     secret_key: str
-    # allowed_origins: list[str] = ["http://localhost:3000"]
     allowed_origins: str = "http://localhost:3000"
 
     # Server
@@ -33,12 +31,13 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
 
-    # SMTP (IMPORTANT FIX HERE)
-    smtp_host: str
-    smtp_port: int = 587
-    smtp_username: str
-    smtp_password: str
-    smtp_from_email: str   
+    # Mail
+    mail_username: str
+    mail_password: str
+    mail_from: str
+    mail_port: int = 587
+    mail_server: str
+    mail_from_name: str = "No Reply"
 
     # AWS
     aws_region: Optional[str] = None
@@ -55,8 +54,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=False,
-        extra="forbid"
+        extra="ignore"  # changed from "forbid" to avoid .env key mismatches
     )
-
 
 settings = Settings()

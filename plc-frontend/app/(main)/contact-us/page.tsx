@@ -1,7 +1,7 @@
-  
 import Image from "next/image";
 import FaqSection from "@/app/components/main-ui/FAQSection";
 import BredCrumbsSection from "@/app/components/BredCrumbsSection";
+import ContactForm from "@/app/components/main-ui/ContactForm";
 
 export const metadata = {
   title: "Contact Us - Get in Touch for Industrial Solutions",
@@ -9,7 +9,6 @@ export const metadata = {
 };
 
 export default function ContactUs() {
-
 
   const contactInfo = [
     {
@@ -20,10 +19,6 @@ export default function ContactUs() {
         <>
           PLC Automation Pte. Ltd. 10 Ubi Crescent, Blk 10, Lobby B Ubi Techpark
           #05-31, Singapore 408564
-          {/* <br />
-          <br />
-          PLC Automation Australia Pty Ltd Suite 302, 13/15 Wentworth Ave Sydney
-          NSW 2000 */}
         </>
       ),
     },
@@ -43,8 +38,8 @@ export default function ContactUs() {
     },
   ];
 
-
-  const offices = [
+  // Main offices — top section mein dikhenge
+  const mainOffices = [
     {
       flag: "🇦🇺",
       country: "Australia",
@@ -60,6 +55,24 @@ export default function ContactUs() {
       email: "sales@plcautomat.com",
       emailHref: "mailto:sales@plcautomat.com",
     },
+    {
+      flag: "🇸🇬",
+      country: "Singapore",
+      company: "PLC Automation Pte. Ltd.",
+      address: [
+        "10 Ubi Crescent Blk 10, Lobby B",
+        "Ubi Techpark #05-31",
+        "Singapore 408564",
+      ],
+      phone: "+65 8950 7034",
+      phoneHref: "tel:+6589507034",
+      email: "sales@plcautomat.com",
+      emailHref: "mailto:sales@plcautomat.com",
+    },
+  ];
+
+  // Baki offices — neeche section mein dikhenge
+  const otherOffices = [
     {
       flag: "🇹🇭",
       country: "Thailand",
@@ -111,20 +124,6 @@ export default function ContactUs() {
       emailHref: "mailto:sales@plcautomat.com",
     },
     {
-      flag: "🇸🇬",
-      country: "Singapore",
-      company: "PLC Automation Pte. Ltd.",
-      address: [
-        "10 Ubi Crescent Blk 10, Lobby B",
-        "Ubi Techpark #05-31",
-        "Singapore 408564",
-      ],
-      phone: "+65 8950 7034",
-      phoneHref: "tel:+6589507034",
-      email: "sales@plcautomat.com",
-      emailHref: "mailto:sales@plcautomat.com",
-    },
-    {
       flag: "🇲🇾",
       country: "Malaysia",
       company: "PLC Automation Group",
@@ -144,8 +143,8 @@ export default function ContactUs() {
       email: "sales@plcautomat.com",
       emailHref: "mailto:sales@plcautomat.com",
     },
-    
   ];
+
   return (
     <main>
       <BredCrumbsSection
@@ -157,40 +156,65 @@ export default function ContactUs() {
         ]}
       />
 
+      {/* MAIN OFFICES — Australia & Singapore */}
       <section className="section_grey_content">
-        <div className="section_container section-inner" style={{paddingTop:'0px'}}>
+        <div className="section_container section-inner" style={{ paddingTop: "0px" }}>
+          {/* <div className="section-header">
+            <h2 className="section-title">Our Main Offices</h2>
+            <p className="section-sub">
+              Our headquarter locations with full operational support.
+            </p>
+          </div> */}
+
+          <div className="address-grid address-grid--main">
+            {mainOffices.map((office) => (
+              <div className="address-card address-card--main" key={office.country}>
+                <h3>
+                  {office.flag} {office.country}
+                </h3>
+                <h4>{office.company}</h4>
+                {office.address.map((line, index) => (
+                  <p key={index}>{line}</p>
+                ))}
+                <div className="reach-out">
+                  Reach out to our Account Manager →
+                </div>
+                <div className="address-contact">
+                  <a href={office.phoneHref}>📞 {office.phone}</a>
+                  <a href={office.emailHref}>✉️ {office.email}</a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* OTHER OFFICES */}
+      <section className="section_grey_content">
+        <div className="section_container section-inner" style={{ paddingTop: "0px" }}>
           <div className="section-header">
-            <h2 className="section-title">Our Offices</h2>
+            <h2 className="section-title">Our Global Offices</h2>
             <p className="section-sub">
               We operate globally with strong presence across key regions.
             </p>
           </div>
 
           <div className="address-grid">
-            {offices.map((office) => (
+            {otherOffices.map((office) => (
               <div className="address-card" key={office.country}>
                 <h3>
                   {office.flag} {office.country}
                 </h3>
-
                 <h4>{office.company}</h4>
-
                 {office.address.map((line, index) => (
                   <p key={index}>{line}</p>
                 ))}
-
                 <div className="reach-out">
                   Reach out to our Account Manager →
                 </div>
-
                 <div className="address-contact">
-                  <a href={office.phoneHref}>
-                    📞 {office.phone}
-                  </a>
-
-                  <a href={office.emailHref}>
-                    ✉️ {office.email}
-                  </a>
+                  <a href={office.phoneHref}>📞 {office.phone}</a>
+                  <a href={office.emailHref}>✉️ {office.email}</a>
                 </div>
               </div>
             ))}
@@ -201,33 +225,21 @@ export default function ContactUs() {
       {/* CONTACT SECTION */}
       <section className="contact-section">
         <div className="contact-inner">
-
-          {/* LEFT INFO */}
           <div className="contact-info">
             <h2>Get in Touch</h2>
             <p>
               Need help sourcing automation parts or have a question?
               Our team is ready to assist you.
             </p>
-
             {contactInfo.map((item, index) => (
               <div className="info-item" key={index}>
                 <div className="contact-icon">
-                  <Image
-                    src={item.icon}
-                    alt={item.alt}
-                    width={20}
-                    height={20}
-                  />
+                  <Image src={item.icon} alt={item.alt} width={20} height={20} />
                 </div>
-
                 <div className="contact-content">
                   <h4>{item.title}</h4>
-
                   {item.href ? (
-                    <a href={item.href} className="contact-link">
-                      {item.content}
-                    </a>
+                    <a href={item.href} className="contact-link">{item.content}</a>
                   ) : (
                     <p>{item.content}</p>
                   )}
@@ -236,33 +248,9 @@ export default function ContactUs() {
             ))}
           </div>
 
-          {/* RIGHT FORM */}
           <div className="contact-form">
             <h3>Send Us a Message</h3>
-
-            <form>
-              <div className="form-row">
-                <input type="text" placeholder="Full Name" required />
-                <input type="email" placeholder="Email Address" required />
-              </div>
-
-              <div className="form-row">
-                <input type="text" placeholder="Phone Number" />
-                <input type="text" placeholder="Company Name" />
-              </div>
-
-              <input
-                type="text"
-                placeholder="Part Number / Inquiry Subject"
-              />
-
-              <textarea
-                rows={5}
-                placeholder="Your Message..."
-              ></textarea>
-
-              <button type="submit">Send Message →</button>
-            </form>
+            <ContactForm />
           </div>
         </div>
       </section>
@@ -276,7 +264,6 @@ export default function ContactUs() {
       </section>
 
       <FaqSection />
-
     </main>
   );
 }

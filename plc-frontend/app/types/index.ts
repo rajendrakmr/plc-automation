@@ -42,3 +42,15 @@ export interface Categories {
   image_url: string;
   cat_slug: string;
 }
+
+
+
+export interface PaginatedResponse<TItem> {
+  records: TItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}

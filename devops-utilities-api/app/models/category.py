@@ -26,3 +26,5 @@ class Category(Base):
     updated_at = Column(TIMESTAMP,server_default=func.now(), onupdate=func.now())
     
     products = relationship("Product", back_populates="category")
+    
+    enquiries = relationship("Enquiry", back_populates="category")

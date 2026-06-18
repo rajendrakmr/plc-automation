@@ -1,12 +1,37 @@
 
 from sqlalchemy.orm import Session
-from typing import Optional
 from fastapi import HTTPException, status
+from typing import Optional
 from app.repositories import blog_repo
-from app.schemas.products import ProductCreate,ProductUpdate
-from app.models.products import Product
+from app.schemas.blog_schema import BlogCreate,BlogUpdate
+from app.models.blog_model import Blog
 
 
+
+def all(
+    db: Session,
+    page: int,
+    limit: int,
+    search: Optional[str] = None,
+    blog_cat_id: Optional[int] = None, 
+    url: Optional[str] = None, 
+    status: Optional[int] = None
+) -> dict:
+
+    blogs, total = blog_repo.get_all(db,page,limit, search, blog_cat_id,url,status)
+
+    return {
+        "records": blogs,
+        "pagination": {
+            "page": page,
+            "limit": limit,
+            "total": total,
+            "pages": (total + limit - 1)  
+        }
+    } 
+    
+    
+    
 def fetch_all(
     db: Session,
     page: int,
@@ -64,79 +89,40 @@ def all_tags(
     tags = blog_repo.list_all_tag(db,limit, search, url) 
     return tags 
  
-# # Create new product
-# def create_product(db: Session, payload: ProductCreate) -> Product: 
-#     existing = product_repo.get_by_part(db, payload.part_no)
-#     if existing:
-#         raise HTTPException(
-#             status_code=status.HTTP_409_CONFLICT,
-#             detail={"errors": {"part_no": "Part No is already exist"}}
-#         )
-#     existing_slug = product_repo.get_by_slug(db, payload.url)
-#     if existing_slug:
-#         raise HTTPException(
-#             status_code=status.HTTP_409_CONFLICT,
-#             detail={"errors": {"part": "Parmalink is already exist"}}
-#         )
+# # Create new blogs service
+def create_blog(db: Session, payload: BlogCreate) -> Blog:  
+    existing = blog_repo.get_by_title(db, payload.blog_title)
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={"errors": {"blug_title": "Same name blogs title is already exist"}}
+        )
+    existing_slug = blog_repo.get_by_slug(db, payload.blog_slug)
+    if existing_slug:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={"errors": {"blog_slug": "Parmalink is already exist"}}
+        )
 
-#     return product_repo.create(db, payload)
+    return blog_repo.create(db, payload)
 
-# # Update existing product
-# def update_product(db: Session,product_id: int, payload: ProductUpdate) -> Product: 
-#     existing_part = product_repo.get_by_part(db, payload.part_no)
-#     if existing_part and existing_part.product_id != product_id:
-#         raise HTTPException(
-#             status_code=status.HTTP_409_CONFLICT,
-#             detail={"errors": {"part_no": "Part No already exists"}}
-#         )
+
+
+#update blogs service
+def update_blog(db: Session, blog_id: int, payload: BlogUpdate) -> Blog:
+    existing = blog_repo.get_by_title(db, payload.blog_title)
+    if existing and existing.blog_id != blog_id: 
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={"errors": {"blog_title": "Same name blog title already exists"}}
+        )
+
+    existing_slug = blog_repo.get_by_slug(db, payload.blog_slug)
+    if existing_slug and existing_slug.blog_id != blog_id:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={"errors": {"blog_slug": "Permalink already exists"}}
+        )
+
+    return blog_repo.update(db, blog_id, payload)
  
-#     existing_slug = product_repo.get_by_slug(db, payload.url)
-#     if existing_slug and existing_slug.product_id != product_id:
-#         raise HTTPException(
-#             status_code=status.HTTP_409_CONFLICT,
-#             detail={"errors": {"url": "Permalink already exists"}}
-#         )
-
-#     return product_repo.update(db, product_id, payload)
-
-# # Delete the existing product
-# def delete_product(db: Session, product_id: int) -> dict:
-#     return product_repo.delete(db, product_id)
-
-
-
-# def fetch_products(
-#     db: Session,
-#     page: int,
-#     limit: int,
-#     search: Optional[str] = None,
-#     category_id: Optional[int] = None,
-#     product_type_id: Optional[int] = None,
-#     stock: Optional[str] = None,
-#     status: Optional[str] = None
-# ) -> dict:
-
-#     products, total = product_repo.get_all(
-#     db=db,
-#     page=page,
-#     limit=limit,
-#     search=search,
-#     category_id=category_id,
-#     product_type_id=product_type_id,
-#     stock=stock,
-#     status=status
-# )
-
-#     return {
-#         "records": products,
-#         "pagination": {
-#             "page": page,
-#             "limit": limit,
-#             "total": total,
-#             "pages": (total + limit - 1) // limit
-#         }
-#     }
-    
-    
-    
-

@@ -1,6 +1,4 @@
-import BreadCrumbsSection from "@/app/components/BredCrumbsSection";
-import BreadCrumb from "@/app/components/sections/BreadCrumb";
-import CareerSection from "@/app/components/sections/CareerSection";
+import BreadCrumbsSection from "@/app/components/BredCrumbsSection"; 
 import JobOpeningSection from "@/app/components/sections/JobOpeningSection";
 
 export const metadata = {

@@ -39,6 +39,7 @@ class Product(Base):
     created_at = Column(TIMESTAMP,server_default=func.now()) 
     updated_at = Column(TIMESTAMP,server_default=func.now(), onupdate=func.now())
     # Relationships
+    enquiries = relationship("Enquiry", back_populates="product")
     category = relationship("Category", back_populates="products") 
     product_type = relationship("ProductType", back_populates="products") 
     meta = relationship("ProductMeta", back_populates="product",cascade="all, delete-orphan")

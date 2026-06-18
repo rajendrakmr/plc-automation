@@ -1,69 +1,50 @@
 "use client";
 
+import { useFetch } from "@/app/components/hooks/useFetch";
+import { PaginatedResponse } from "@/app/types";
 import { useState, useMemo } from "react";
  
-const DEMO_ENQUIRIES: Enquiry[] = [
-  // {
-  //   id: "ENQ-001",
-  //   name: "Rahul Agarwal",
-  //   email: "rahul.agarwal@gmail.com",
-  //   phone: "9876543210",
-  //   subject: "Product availability query – SN-2045",
-  //   message: "Hello,\n\nI wanted to know if the sensor model SN-2045 is currently in stock. We need around 50 units for a project starting next month.\n\nPlease let us know the earliest possible delivery date.\n\nRegards,\nRahul",
-  //   source: "Contact Form",
-  //   status: "new",
-  //   created_at: new Date(Date.now() - 1000 * 60 * 38).toISOString(),
-  // },
-  // {
-  //   id: "ENQ-002",
-  //   name: "Priya Mehta",
-  //   email: "priya.m@techcorp.in",
-  //   phone: "8765432109",
-  //   subject: "Bulk order pricing for Actuators AC-1100",
-  //   message: "Hi team,\n\nWe are interested in placing a bulk order of approximately 200 actuators (model AC-1100). Could you please send us a detailed pricing sheet and any applicable discounts for bulk purchase?\n\nRegards,\nPriya Mehta\nTech Corp India",
-  //   source: "Website Form",
-  //   status: "replied",
-  //   created_at: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
-  // }
-];
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export interface Enquiry {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  subject: string;
-  message: string;
-  source: "Contact Form" | "Website Form" | "Email" | string;
-  status: "new" | "replied" | "pending" | "closed";
-  created_at: string; // ISO string
+export interface EnquiryCategory {
+  category_id: number;
+  cat_name: string;
 }
 
+export interface EnquiryProduct {
+  product_id: number;
+  part_no: string;
+}
+
+export interface Enquiry {
+  contact_id: number;
+  product_id?: number | null;
+  category_id?: number | null;
+  part_number?: string | null;
+  manufacturer?: string | null;
+  quantity?: number;
+  subject?: string | null;
+  enquiry_date?: string | null;
+  telephone?: string | null;
+  email_address?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  company_name?: string | null;
+  customer_name: string;
+  content?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  category?: EnquiryCategory | null;
+  product?: EnquiryProduct | null;
+} 
 interface FilterState {
   search: string;
   status: string;
-  source: string;
+  isSearch?: boolean;
+  isClear?: boolean;
 }
 
 type SortDir = "asc" | "desc";
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function StatusBadge({ status }: { status: Enquiry["status"] }) {
-  const map: Record<
-    Enquiry["status"],
-    { label: string; cls: string }
-  > = {
-    new: { label: "New", cls: "badge-new" },
-    replied: { label: "Replied", cls: "badge-replied" },
-    pending: { label: "Pending", cls: "badge-pending" },
-    closed: { label: "Closed", cls: "badge-closed" },
-  };
-  const { label, cls } = map[status] ?? map["new"];
-  return <span className={`status-badge ${cls}`}>{label}</span>;
-}
+ 
+ 
 
 function AvatarCircle({ name }: { name: string }) {
   const initials = name
@@ -71,7 +52,7 @@ function AvatarCircle({ name }: { name: string }) {
     .slice(0, 2)
     .map((w) => w[0]?.toUpperCase() ?? "")
     .join("");
- 
+
   const colors = [
     { bg: "#E6F1FB", text: "#185FA5" },
     { bg: "#E1F5EE", text: "#0F6E56" },
@@ -83,8 +64,7 @@ function AvatarCircle({ name }: { name: string }) {
     { bg: "#F1EFE8", text: "#5F5E5A" },
   ];
   const idx =
-    name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) %
-    colors.length;
+    name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) % colors.length;
   const { bg, text } = colors[idx];
 
   return (
@@ -100,25 +80,23 @@ function AvatarCircle({ name }: { name: string }) {
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   if (!active) return <span className="sort-icon">↕</span>;
-  return (
-    <span className="sort-icon active">{dir === "asc" ? "↑" : "↓"}</span>
-  );
+  return <span className="sort-icon active">{dir === "asc" ? "↑" : "↓"}</span>;
 }
- 
+
+// ─── Reply Modal ──────────────────────────────────────────────────────────────
+
 interface ReplyModalProps {
   enquiry: Enquiry | null;
-  onClose: () => void;
-  onSend: (id: string, message: string) => void;
+  onClose: () => void; 
+  onSend: (contactId: number, message: string) => void;
 }
 
 function ReplyModal({ enquiry, onClose, onSend }: ReplyModalProps) {
-  const [text, setText] = useState("");
-
-  if (!enquiry) return null;
-
+  const [text, setText] = useState(""); 
+  if (!enquiry) return null; 
   const handleSend = () => {
     if (!text.trim()) return;
-    onSend(enquiry.id, text.trim());
+    onSend(enquiry.contact_id, text.trim());
     setText("");
     onClose();
   };
@@ -137,12 +115,12 @@ function ReplyModal({ enquiry, onClose, onSend }: ReplyModalProps) {
           <button className="icon-btn" onClick={onClose} aria-label="Close modal">✕</button>
         </div>
         <div className="modal-meta">
-          <span className="modal-label">To:</span>
-          <span>{enquiry.name} &lt;{enquiry.email}&gt;</span>
+          <span className="modal-label">To:</span> 
+          <span>{enquiry.customer_name} &lt;{enquiry.email_address ?? "N/A"}&gt;</span>
         </div>
         <div className="modal-meta">
-          <span className="modal-label">Re:</span>
-          <span>{enquiry.subject}</span>
+          <span className="modal-label">Re:</span> 
+          <span>{enquiry.subject ?? enquiry.part_number ?? "—"}</span>
         </div>
         <textarea
           className="reply-textarea"
@@ -187,35 +165,55 @@ function DetailModal({ enquiry, onClose, onReply }: DetailModalProps) {
         </div>
 
         <div className="detail-sender-row">
-          <AvatarCircle name={enquiry.name} />
+          <AvatarCircle name={enquiry.customer_name} />
           <div className="detail-sender-info">
-            <span className="detail-name">{enquiry.name}</span>
-            <span className="detail-email">{enquiry.email}</span>
-          </div>
-          <StatusBadge status={enquiry.status} />
+            <span className="detail-name">{enquiry.customer_name}</span>
+            <span className="detail-email">{enquiry.email_address ?? "—"}</span>
+          </div> 
+          {enquiry.category && (
+            <span className="source-pill">{enquiry.category.cat_name}</span>
+          )}
         </div>
 
-        <div className="detail-meta-grid">
+        <div className="detail-meta-grid"> 
           <span className="detail-key">Subject</span>
-          <span className="detail-val">{enquiry.subject}</span>
-          {enquiry.phone && (
+          <span className="detail-val">{enquiry.subject ?? enquiry.part_number ?? "—"}</span>
+
+          <span className="detail-key">Part No.</span>
+          <span className="detail-val">{enquiry.part_number ?? "—"}</span>
+
+          <span className="detail-key">Manufacturer</span>
+          <span className="detail-val">{enquiry.manufacturer ?? "—"}</span>
+
+          <span className="detail-key">Quantity</span>
+          <span className="detail-val">{enquiry.quantity ?? "—"}</span>
+
+          {enquiry.company_name && (
             <>
-              <span className="detail-key">Phone</span>
-              <span className="detail-val">{enquiry.phone}</span>
+              <span className="detail-key">Company</span>
+              <span className="detail-val">{enquiry.company_name}</span>
             </>
           )}
-          <span className="detail-key">Source</span>
-          <span className="detail-val">{enquiry.source}</span>
-          <span className="detail-key">Received</span>
-          <span className="detail-val">
-            {new Date(enquiry.created_at).toLocaleString("en-IN", {
-              dateStyle: "medium",
-              timeStyle: "short",
-            })}
-          </span>
+
+          {enquiry.telephone && (
+            <>
+              <span className="detail-key">Phone</span>
+              <span className="detail-val">{enquiry.telephone}</span>
+            </>
+          )} 
+          {enquiry.enquiry_date && (
+            <>
+              <span className="detail-key">Date</span>
+              <span className="detail-val">
+                {new Date(enquiry.enquiry_date).toLocaleDateString("en-IN", {
+                  dateStyle: "medium",
+                })}
+              </span>
+            </>
+          )}
         </div>
 
-        <div className="detail-message">{enquiry.message}</div>
+        <div className="detail-message">{enquiry.content ?? "No message content."}</div>
 
         <div className="modal-footer">
           <button className="btn" onClick={onClose}>Close</button>
@@ -230,63 +228,39 @@ function DetailModal({ enquiry, onClose, onReply }: DetailModalProps) {
     </div>
   );
 }
-
-// ─── Main Page ────────────────────────────────────────────────────────────────
-
+ 
 export default function EnquiriesPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [sortKey, setSortKey] = useState<keyof Enquiry | null>(null);
-  const [sortDir, setSortDir] = useState<SortDir>("asc");
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [sortDir, setSortDir] = useState<SortDir>("asc"); 
+  const [selected, setSelected] = useState<Set<number>>(new Set());
   const [filterVisible, setFilterVisible] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const [filters, setFilters] = useState<FilterState>({ search: "", status: "", source: "" });
-  const [pendingFilters, setPendingFilters] = useState<FilterState>({ search: "", status: "", source: "" });
+  const [refreshing, setRefreshing] = useState(false); 
+  const [filters, setFilters] = useState<FilterState>({ search: "", status: "", isSearch: false });
+  const [pendingFilters, setPendingFilters] = useState<FilterState>({ search: "", status: "", isSearch: false });
 
   const [replyTarget, setReplyTarget] = useState<Enquiry | null>(null);
   const [detailTarget, setDetailTarget] = useState<Enquiry | null>(null);
+
+  const { loading, error, data, total, totalPages, refetch } =
+    useFetch<PaginatedResponse<Enquiry>>({
+      url: "/enquiries",
+      params: {
+        page,
+        limit,
+        search: filters.search || undefined,
+        status: filters.status || undefined,
+        sort: sortKey ?? undefined,
+        isClear: filters.isClear || undefined,
+        isSearch: filters.isSearch || undefined,
+      },
+    });
  
-  const [demoData, setDemoData] = useState<Enquiry[]>(DEMO_ENQUIRIES);
-  const [loading] = useState(false);
-  const [error] = useState<string | null>(null);
-
-  const refetch = () => { };  
-
-  const filteredData = useMemo(() => {
-    let list = [...demoData];
-
-    if (filters.search) {
-      const q = filters.search.toLowerCase();
-      list = list.filter(
-        (e) =>
-          e.name.toLowerCase().includes(q) ||
-          e.email.toLowerCase().includes(q) ||
-          e.subject.toLowerCase().includes(q)
-      );
-    }
-    if (filters.status) list = list.filter((e) => e.status === filters.status);
-    if (filters.source) list = list.filter((e) => e.source === filters.source);
-
-    if (sortKey) {
-      list.sort((a, b) => {
-        const av = String(a[sortKey] ?? "");
-        const bv = String(b[sortKey] ?? "");
-        return sortDir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
-      });
-    }
-
-    return list;
-  }, [demoData, filters, sortKey, sortDir]);
-
-  const total = filteredData.length;
-  const totalPages = Math.max(1, Math.ceil(total / limit));
-  const enquiries = filteredData.slice((page - 1) * limit, page * limit);
-
-  // ── Derived ─────────────────────────────────────────────────────────────────
+  const enquiries: Enquiry[] = data?.records ?? [];
+  
   const activeFilterCount = useMemo(
-    () => Object.values(filters).filter(Boolean).length,
+    () => [filters.search, filters.status].filter(Boolean).length,
     [filters]
   );
 
@@ -296,8 +270,9 @@ export default function EnquiriesPage() {
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }, [page, totalPages]);
 
+  // FIX: allSelected checks contact_id (number) in the Set
   const allSelected =
-    enquiries.length > 0 && enquiries.every((e) => selected.has(e.id));
+    enquiries.length > 0 && enquiries.every((e) => selected.has(e.contact_id));
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
   const handleSort = (key: keyof Enquiry) => {
@@ -306,10 +281,13 @@ export default function EnquiriesPage() {
     setPage(1);
   };
 
-  const handleApplyFilters = () => { setFilters({ ...pendingFilters }); setPage(1); };
+  const handleApplyFilters = () => {
+    setFilters({ ...pendingFilters, isSearch: true });
+    setPage(1);
+  };
 
   const handleClearFilters = () => {
-    const empty: FilterState = { search: "", status: "", source: "" };
+    const empty: FilterState = { search: "", status: "", isSearch: false, isClear: true };
     setPendingFilters(empty);
     setFilters(empty);
     setPage(1);
@@ -321,11 +299,13 @@ export default function EnquiriesPage() {
     setTimeout(() => setRefreshing(false), 700);
   };
 
+  // FIX: handleSelectAll uses contact_id (number)
   const handleSelectAll = (checked: boolean) => {
-    setSelected(checked ? new Set(enquiries.map((e) => e.id)) : new Set());
+    setSelected(checked ? new Set(enquiries.map((e) => e.contact_id)) : new Set());
   };
 
-  const handleSelectRow = (id: string, checked: boolean) => {
+  // FIX: handleSelectRow uses number
+  const handleSelectRow = (id: number, checked: boolean) => {
     setSelected((prev) => {
       const next = new Set(prev);
       checked ? next.add(id) : next.delete(id);
@@ -334,32 +314,28 @@ export default function EnquiriesPage() {
   };
 
   const handleBulkAction = (action: string) => {
-    if (action === "delete") {
-      setDemoData((prev) => prev.filter((e) => !selected.has(e.id)));
-    } else if (action === "replied" || action === "closed") {
-      setDemoData((prev) =>
-        prev.map((e) =>
-          selected.has(e.id) ? { ...e, status: action as Enquiry["status"] } : e
-        )
-      );
-    }
+    // Implement API calls for bulk actions here as needed
+    console.log("Bulk action:", action, [...selected]);
     setSelected(new Set());
   };
 
-  const handleRowAction = (action: string, id: string) => {
-    if (action === "delete") {
-      setDemoData((prev) => prev.filter((e) => e.id !== id));
-    }
+  // FIX: handleRowAction uses number id
+  const handleRowAction = (action: string, id: number) => {
+    console.log("Row action:", action, id);
+    // Implement delete API call here
   };
 
-  const handleSendReply = (id: string, _message: string) => {
-    setDemoData((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, status: "replied" } : e))
-    );
+  // FIX: onSend receives number contactId
+  const handleSendReply = (contactId: number, _message: string) => {
+    console.log("Send reply to contact:", contactId, _message);
+    // Implement send reply API call here
   };
 
-  const formatTime = (iso: string) => {
+  // FIX: guard against null/undefined enquiry_date
+  const formatTime = (iso: string | null | undefined) => {
+    if (!iso) return "—";
     const d = new Date(iso);
+    if (isNaN(d.getTime())) return "—";
     const now = new Date();
     const diffMs = now.getTime() - d.getTime();
     const diffDays = Math.floor(diffMs / 86400000);
@@ -370,111 +346,45 @@ export default function EnquiriesPage() {
     return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
   };
 
-  // ── Render ───────────────────────────────────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────────────────────────
   return (
     <>
       <style>{`
-        /* ── Page ── */
-        .enq-page { background: #637b7b; padding: 1.5rem; max-width: 1100px; margin: 0 auto; font-family: 'DM Sans', sans-serif; }
-
-        /* ── Top bar ── */
-        .rk_topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; gap: 12px; flex-wrap: wrap; }
-        .rk_topbar-left { display: flex; align-items: center; gap: 10px; }
-        .page-title { font-size: 18px; font-weight: 600; color: #fff; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-        .badge-info { background: #dbeafe; color: #1e40af; }
-        .badge-new-count { background: #fee2e2; color: #7f1d1d; }
-        .rk_topbar-right { display: flex; align-items: center; gap: 8px; }
-
-        /* ── Buttons ── */
-        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #1e293b; transition: background 0.15s; font-family: inherit; }
-        .btn:hover { background: #f8fafc; border-color: #cbd5e1; }
-        .btn-icon { width: 34px; height: 34px; padding: 0; justify-content: center; }
-        .btn-primary { background: #0d9488; color: #f8fafc; border-color: #0d9488; }
-        .btn-primary:hover { background: #0f766e; }
-        .btn-danger { color: #dc2626; border-color: #fca5a5; }
-        .btn-danger:hover { background: #fee2e2; }
-        .icon-btn { background: none; border: none; cursor: pointer; padding: 5px 6px; border-radius: 6px; color: #94a3b8; font-size: 14px; transition: background 0.12s, color 0.12s; font-family: inherit; }
-        .icon-btn:hover { background: #f1f5f9; color: #1e293b; }
-        .spin { animation: spin 0.6s linear infinite; display: inline-block; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ── Filter bar ── */
-        .filter-bar { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; margin-bottom: 1rem; display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
-        .filter-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0px; }
-        .filter-group label { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
-        .filter-group input, .filter-group select { height: 36px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0 10px; font-size: 13px; background: #f8fafc; color: #1e293b; outline: none; width: 100%; font-family: inherit; transition: border-color 0.15s; }
-        .filter-group input:focus, .filter-group select:focus { border-color: #3b82f6; background: #fff; }
-        .filter-group.search-wrap { position: relative; flex: 2; min-width: 180px; }
-        .filter-group.search-wrap input { padding-left: 34px; }
-        .search-icon { position: absolute; left: 10px; top: 8px; color: #94a3b8; font-size: 15px; pointer-events: none; }
-        .filter-actions { display: flex; gap: 8px; align-self: flex-end; }
-
-        /* ── Table wrap ── */
-        .table-wrap { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
-
-        /* ── Bulk bar ── */
+        .enq-page {   padding: 1.5rem; max-width: 1100px; margin: 0 auto; font-family: 'DM Sans', sans-serif; }
+        
+       
+        .table-wrap {   border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
         .bulk-bar { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: #eff6ff; border-bottom: 1px solid #bfdbfe; font-size: 13px; }
         .bulk-bar-text { color: #1e40af; font-weight: 500; }
-
-        /* ── Enquiry rows (Gmail-style) ── */
         .enq-row { display: flex; align-items: stretch; border-bottom: 1px solid #f1f5f9; transition: background 0.1s; cursor: default; }
         .enq-row:last-child { border-bottom: none; }
         .enq-row:hover { background: #f8fafc; }
         .enq-row.row-selected { background: #eff6ff; }
-        .enq-row.unread .sender-name { font-weight: 700; }
-        .enq-row.unread .enq-subject { font-weight: 600; }
-
-        /* columns */
         .col-check { width: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0 4px 0 12px; }
         .col-dot { width: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: #3b82f6; display: none; }
-        .enq-row.unread .unread-dot { display: block; }
         .col-avatar { width: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .col-body { flex: 1; padding: 10px 12px 10px 6px; min-width: 0; cursor: pointer; }
         .col-time { width: 80px; display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0; padding-right: 12px; font-size: 12px; color: #64748b; white-space: nowrap; }
         .col-actions { width: 90px; display: flex; align-items: center; justify-content: flex-end; gap: 2px; padding-right: 12px; flex-shrink: 0; opacity: 0; transition: opacity 0.12s; }
         .enq-row:hover .col-actions { opacity: 1; }
-
-        /* body layout */
         .body-top { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
-        .sender-name { font-size: 13px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
-        .enq-subject { font-size: 13px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sender-name { font-size: 13px; font-weight: 600; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+        .enq-subject { font-size: 13px; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .enq-preview { font-size: 12px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .body-bot { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
-
-        /* avatar */
         .avatar-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
-
-        /* status badges */
         .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
         .status-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
         .badge-new     { background: #fee2e2; color: #7f1d1d; } .badge-new::before     { background: #dc2626; }
         .badge-replied { background: #dcfce7; color: #14532d; } .badge-replied::before { background: #16a34a; }
         .badge-pending { background: #fef9c3; color: #713f12; } .badge-pending::before { background: #ca8a04; }
         .badge-closed  { background: #f1f5f9; color: #64748b; } .badge-closed::before  { background: #94a3b8; }
-
-        /* source pill */
         .source-pill { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; color: #64748b; background: #f1f5f9; border: 1px solid #e2e8f0; }
-
-        /* action buttons */
         .action-btn { background: none; border: none; cursor: pointer; padding: 5px 6px; border-radius: 6px; color: #94a3b8; font-size: 14px; transition: background 0.12s, color 0.12s; }
         .action-btn:hover { background: #f1f5f9; color: #1e293b; }
         .action-btn.danger:hover { background: #fee2e2; color: #dc2626; }
-
-        /* sort */
         .sort-icon { opacity: 0.35; font-size: 11px; margin-left: 3px; }
         .sort-icon.active { opacity: 1; color: #3b82f6; }
-
-        /* table header */
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        thead tr { border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
-        thead th { padding: 10px 14px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; text-align: left; cursor: pointer; user-select: none; white-space: nowrap; }
-        thead th.no-sort { cursor: default; }
-        tbody tr { border-bottom: 1px solid #f1f5f9; }
-        tbody tr:last-child { border-bottom: none; }
-
-        /* footer */
         .table-footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-top: 1px solid #e2e8f0; flex-wrap: wrap; gap: 10px; background: #f8fafc; }
         .page-info { font-size: 12px; color: #64748b; }
         .page-info strong { color: #1e293b; }
@@ -484,17 +394,11 @@ export default function EnquiriesPage() {
         .pg-btn.pg-active { background: #1e293b; color: #fff; border-color: #1e293b; }
         .pg-btn:disabled { opacity: 0.35; cursor: not-allowed; }
         .limit-select { height: 30px; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0 8px; font-size: 12px; background: #fff; color: #1e293b; font-family: inherit; }
-
-        /* empty / loading */
         .empty-state { text-align: center; padding: 48px 20px; color: #94a3b8; font-size: 13px; }
         .empty-icon { font-size: 32px; margin-bottom: 8px; }
         .loading-overlay { opacity: 0.5; pointer-events: none; }
         .error-msg { padding: 12px 16px; background: #fee2e2; color: #7f1d1d; font-size: 13px; border-bottom: 1px solid #fca5a5; }
-
-        /* checkbox */
         input[type="checkbox"] { width: 15px; height: 15px; cursor: pointer; accent-color: #3b82f6; }
-
-        /* ── Modals ── */
         .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; z-index: 50; }
         .modal-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 1.25rem; width: 440px; max-width: 95vw; box-shadow: 0 8px 32px rgba(0,0,0,0.12); display: flex; flex-direction: column; gap: 10px; }
         .detail-modal-card { width: 500px; max-height: 85vh; overflow-y: auto; }
@@ -505,19 +409,16 @@ export default function EnquiriesPage() {
         .reply-textarea { width: 100%; height: 110px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 9px 12px; font-size: 13px; font-family: inherit; background: #f8fafc; color: #1e293b; resize: none; outline: none; transition: border-color 0.15s; }
         .reply-textarea:focus { border-color: #3b82f6; background: #fff; }
         .modal-footer { display: flex; justify-content: flex-end; gap: 8px; }
-
-        /* detail modal specifics */
         .detail-sender-row { display: flex; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9; margin-bottom: 4px; }
         .detail-sender-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
         .detail-name { font-size: 14px; font-weight: 600; color: #1e293b; }
         .detail-email { font-size: 12px; color: #64748b; }
-        .detail-meta-grid { display: grid; grid-template-columns: 80px 1fr; gap: 6px 12px; font-size: 13px; margin: 10px 0; }
+        .detail-meta-grid { display: grid; grid-template-columns: 90px 1fr; gap: 6px 12px; font-size: 13px; margin: 10px 0; }
         .detail-key { color: #64748b; }
         .detail-val { color: #1e293b; }
         .detail-message { font-size: 13px; color: #1e293b; line-height: 1.7; white-space: pre-wrap; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; }
       `}</style>
 
-      {/* ── Modals ── */}
       <ReplyModal
         enquiry={replyTarget}
         onClose={() => setReplyTarget(null)}
@@ -529,11 +430,11 @@ export default function EnquiriesPage() {
         onReply={(enq) => setReplyTarget(enq)}
       />
 
-      <div className="enq-page"> 
+      <div className="enq-page">
         <div className="rk_topbar">
           <div className="rk_topbar-left">
             <span className="page-title">Enquiries</span>
-            <span className="badge badge-info">{total ?? 0}</span>
+            <span className="badge badge-info">{total}</span>
           </div>
           <div className="rk_topbar-right">
             <button
@@ -553,195 +454,163 @@ export default function EnquiriesPage() {
               )}
             </button>
           </div>
-        </div> 
+        </div>
+
         {filterVisible && (
-          <div className="filter-bar">
-            <div className="filter-group search-wrap">
-              <label>Search</label>
-              <span className="search-icon">🔍</span>
-              <input
-                type="text"
-                placeholder="Name, email, subject..."
-                value={pendingFilters.search}
-                onChange={(e) =>
-                  setPendingFilters((f) => ({ ...f, search: e.target.value }))
-                }
-                onKeyDown={(e) => e.key === "Enter" && handleApplyFilters()}
-              />
+          <>
+            <div className="filter-bar">
+              <div className="filter-group search-wrap">
+                <label>Search</label>
+                <span className="search-icon">🔍</span>
+                <input
+                  type="text"
+                  placeholder="Name, email, part number..."
+                  value={pendingFilters.search}
+                  onChange={(e) =>
+                    setPendingFilters((f) => ({ ...f, search: e.target.value }))
+                  }
+                  onKeyDown={(e) => e.key === "Enter" && handleApplyFilters()}
+                />
+              </div>
+
+              {/* FIX: status filter now correctly updates `status` key */}
+              <div className="filter-group">
+                <label>Status</label>
+                <select
+                  value={pendingFilters.status}
+                  onChange={(e) =>
+                    setPendingFilters((f) => ({ ...f, status: e.target.value }))
+                  }
+                >
+                  <option value="">All Status</option>
+                  <option value="new">New</option>
+                  <option value="replied">Replied</option>
+                  <option value="pending">Pending</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
             </div>
-            
-            <div className="filter-group">
-              <label>Status</label>
-              <select
-                value={pendingFilters.status}
-                onChange={(e) =>
-                  setPendingFilters((f) => ({ ...f, status: e.target.value }))
-                }
-              >
-                <option value="">All Status</option>
-                <option value="new">New</option>
-                <option value="replied">Replied</option>
-                <option value="pending">Pending</option>
-                <option value="closed">Closed</option>
-              </select>
+
+            <div className="filter-actions" style={{ marginBottom: "8px" }}>
+              <button className="btn" onClick={handleClearFilters}>Clear</button>
+              <button className="btn btn-primary" onClick={handleApplyFilters}>Apply</button>
             </div>
-            <div className="filter-group">
-              <label>Source</label>
-              <select
-                value={pendingFilters.source}
-                onChange={(e) =>
-                  setPendingFilters((f) => ({ ...f, source: e.target.value }))
-                }
-              >
-                <option value="">All Sources</option>
-                <option value="Contact Form">Contact Form</option>
-                <option value="Website Form">Website Form</option>
-                <option value="Email">Email</option>
-              </select>
-            </div>
-            
-            <div className="filter-actions">
-              <button className="btn" onClick={handleClearFilters}>
-                Clear
-              </button>
-              <button className="btn btn-primary" onClick={handleApplyFilters}>
-                Apply
-              </button>
-            </div>
-          </div>
+          </>
         )}
 
-      
-        <div className="table-wrap"> 
+        <div className="table-wrap">
           {selected.size > 0 && (
             <div className="bulk-bar">
               <span className="bulk-bar-text">{selected.size} selected</span>
-              <button
-                className="btn"
-                style={{ marginLeft: "auto" }}
-                onClick={() => handleBulkAction("replied")}
-              >
+              <button className="btn" style={{ marginLeft: "auto" }} onClick={() => handleBulkAction("replied")}>
                 ✓ Mark Replied
               </button>
-              <button className="btn" onClick={() => handleBulkAction("closed")}>
-                📁 Close
-              </button>
-              <button
-                className="btn btn-danger"
-                onClick={() => handleBulkAction("delete")}
-              >
-                🗑 Delete
-              </button>
+              <button className="btn" onClick={() => handleBulkAction("closed")}>📁 Close</button>
+              <button className="btn btn-danger" onClick={() => handleBulkAction("delete")}>🗑 Delete</button>
             </div>
           )}
 
           {error && <div className="error-msg">⚠ {error}</div>}
 
-          <div className={loading ? "loading-overlay" : ""}>  
-            <div> 
+          <div className={loading ? "loading-overlay" : ""}> 
+            <div style={{ display: "flex", alignItems: "center", padding: "8px 12px 8px 0", borderBottom: "1px solid #e2e8f0", color:"#fff" ,background: "#220429" }}>
+              <div className="col-check">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={(e) => handleSelectAll(e.target.checked)}
+                  aria-label="Select all"
+                />
+              </div>
+              <div className="col-dot" />
+              <div className="col-avatar" />
               <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "8px 12px 8px 0",
-                  borderBottom: "1px solid #e2e8f0",
-                  background: "#f8fafc",
-                }}
+                style={{ flex: 1, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#fff", cursor: "pointer", userSelect: "none" }}
+                onClick={() => handleSort("customer_name")}
               >
-                <div className="col-check">
-                  <input
-                    type="checkbox"
-                    checked={allSelected}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                    aria-label="Select all"
-                  />
-                </div>
-                <div className="col-dot" />
-                <div className="col-avatar" />
+                Enquiry <SortIcon active={sortKey === "customer_name"} dir={sortDir} />
+              </div>
+              <div
+                style={{ width: 80, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#fff", cursor: "pointer", userSelect: "none", textAlign: "right", paddingRight: 12 }}
+                onClick={() => handleSort("enquiry_date")}
+              > 
+                Date <SortIcon active={sortKey === "enquiry_date"} dir={sortDir} />
+              </div>
+              <div style={{ width: 90 }} />
+            </div> 
+            {enquiries.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">📬</div>
+                {loading ? "Loading..." : "No enquiries found"}
+              </div>
+            ) : (
+              enquiries.map((enq) => (
                 <div
-                  style={{ flex: 1, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b", cursor: "pointer", userSelect: "none" }}
-                  onClick={() => handleSort("name")}
+                  key={enq.contact_id} 
+                  className={`enq-row ${selected.has(enq.contact_id) ? "row-selected" : ""}`}
                 >
-                  Enquiry <SortIcon active={sortKey === "name"} dir={sortDir} />
-                </div>
-                <div
-                  style={{ width: 80, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b", cursor: "pointer", userSelect: "none", textAlign: "right", paddingRight: 12 }}
-                  onClick={() => handleSort("created_at")}
-                >
-                  Time <SortIcon active={sortKey === "created_at"} dir={sortDir} />
-                </div>
-                <div style={{ width: 90 }} />
-              </div> 
-              {enquiries.length === 0 ? (
-                <div className="empty-state">
-                  <div className="empty-icon">📬</div>
-                  {loading ? "Loading..." : "No enquiries found"}
-                </div>
-              ) : (
-                enquiries.map((enq) => (
-                  <div
-                    key={enq.id}
-                    className={`enq-row ${selected.has(enq.id) ? "row-selected" : ""} ${enq.status === "new" ? "unread" : ""}`}
-                  >
-                    <div className="col-check">
-                      <input
-                        type="checkbox"
-                        checked={selected.has(enq.id)}
-                        onChange={(e) => handleSelectRow(enq.id, e.target.checked)}
-                        aria-label={`Select enquiry from ${enq.name}`}
-                      />
-                    </div>
-                    <div className="col-dot">
-                      <div className="unread-dot" />
-                    </div>
-                    <div className="col-avatar">
-                      <AvatarCircle name={enq.name} />
-                    </div>
-                    <div
-                      className="col-body"
-                      onClick={() => setDetailTarget(enq)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => e.key === "Enter" && setDetailTarget(enq)}
-                      aria-label={`Open enquiry from ${enq.name}: ${enq.subject}`}
-                    >
-                      <div className="body-top">
-                        <span className="sender-name">{enq.name}</span>
-                        <span className="enq-subject">{enq.subject}</span>
-                        <span className="enq-preview">
-                          — {enq.message.split("\n")[0]}
-                        </span>
-                      </div>
-                      <div className="body-bot">
-                        <StatusBadge status={enq.status} />
-                        <span className="source-pill">{enq.source}</span>
-                      </div>
-                    </div>
-                    <div className="col-time">{formatTime(enq.created_at)}</div>
-                    <div className="col-actions">
-                      <button
-                        className="action-btn"
-                        title="Reply"
-                        aria-label={`Reply to ${enq.name}`}
-                        onClick={() => setReplyTarget(enq)}
-                      >
-                        ↩️
-                      </button>
-                      <button
-                        className="action-btn danger"
-                        title="Delete"
-                        aria-label={`Delete enquiry from ${enq.name}`}
-                        onClick={() => handleRowAction("delete", enq.id)}
-                      >
-                        🗑️
-                      </button>
-                    </div>
+                  <div className="col-check">
+                    <input
+                      type="checkbox"
+                      checked={selected.has(enq.contact_id)}
+                      onChange={(e) => handleSelectRow(enq.contact_id, e.target.checked)}
+                      aria-label={`Select enquiry from ${enq.customer_name}`}
+                    />
                   </div>
-                ))
-              )}
-            </div>
+                  <div className="col-dot" />
+                  <div className="col-avatar">
+                    <AvatarCircle name={enq.customer_name} />
+                  </div>
+                  <div
+                    className="col-body"
+                    onClick={() => setDetailTarget(enq)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === "Enter" && setDetailTarget(enq)}
+                    aria-label={`Open enquiry from ${enq.customer_name}`}
+                  >
+                    <div className="body-top">
+                      <span className="sender-name">{enq.customer_name}</span> 
+                      <span className="enq-subject">
+                        {enq.subject ?? enq.part_number ?? "—"}
+                      </span>
+                    </div>
+                    <div className="body-bot"> 
+                      <span className="enq-preview">
+                        {enq.content ? `— ${enq.content.split("\n")[0]}` : ""}
+                      </span> 
+                      {enq.manufacturer && (
+                        <span className="source-pill">{enq.manufacturer}</span>
+                      )}
+                      {enq.category && (
+                        <span className="source-pill">{enq.category.cat_name}</span>
+                      )}
+                    </div>
+                  </div> 
+                  <div className="col-time">{formatTime(enq.enquiry_date)}</div>
+                  <div className="col-actions">
+                    <button
+                      className="action-btn"
+                      title="Reply"
+                      aria-label={`Reply to ${enq.customer_name}`}
+                      onClick={() => setReplyTarget(enq)}
+                    >
+                      ↩️
+                    </button>
+                    <button
+                      className="action-btn danger"
+                      title="Delete"
+                      aria-label={`Delete enquiry from ${enq.customer_name}`}
+                      onClick={() => handleRowAction("delete", enq.contact_id)}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
- 
+
           <div className="table-footer">
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span className="page-info">Rows:</span>
@@ -758,10 +627,9 @@ export default function EnquiriesPage() {
             <span className="page-info">
               Showing{" "}
               <strong>
-                {total ? (page - 1) * limit + 1 : 0}–
-                {Math.min(page * limit, total ?? 0)}
+                {total ? (page - 1) * limit + 1 : 0}–{Math.min(page * limit, total)}
               </strong>{" "}
-              of <strong>{total ?? 0}</strong>
+              of <strong>{total}</strong>
             </span>
             <div className="pagination">
               <button
@@ -784,7 +652,7 @@ export default function EnquiriesPage() {
               ))}
               <button
                 className="pg-btn"
-                disabled={page >= (totalPages ?? 1)}
+                disabled={page >= totalPages}
                 onClick={() => setPage((p) => p + 1)}
                 aria-label="Next page"
               >

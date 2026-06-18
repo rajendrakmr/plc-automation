@@ -4,8 +4,9 @@
 import { useState } from "react";
 
 interface CheckboxItem {
-  id: string;
-  label: string;
+  blog_tag_name: string;
+  blog_tag_slug?: string;
+  blog_tag_id: string;
 }
 
 interface CheckboxListProps {
@@ -78,15 +79,15 @@ export default function CheckBoxList({
 
       {/* Item list */}
       {displayItems.map((item) => (
-        <label key={item.id} style={checkboxRowStyle}>
+        <label key={item.blog_tag_id} style={checkboxRowStyle}>
           <input
             type="checkbox"
-            checked={selected.includes(item.id)}
-            onChange={() => toggle(item.id)}
+            checked={selected.includes(item.blog_tag_id)}
+            onChange={() => toggle(item.blog_tag_id)}
             style={{ accentColor: "#0d9488", width: "15px", height: "15px" }}
           />
-          {item.label}
-          {selected.includes(item.id) && (
+          {item.blog_tag_name}
+          {selected.includes(item.blog_tag_id) && (
             <span
               style={{
                 marginLeft: "auto",

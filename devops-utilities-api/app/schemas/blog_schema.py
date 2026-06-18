@@ -20,6 +20,10 @@ class BlogCategoryResponse(BaseModel):
         from_attributes = True
 
 
+
+class BlogTagMap(BaseModel): 
+    blog_tag_id: str | None = None
+    
 # ─────────────────────────────────────────
 # Blog Tag
 # ─────────────────────────────────────────
@@ -49,9 +53,10 @@ class BlogCreate(BaseModel):
     blog_meta_title: Optional[str] = Field(None, max_length=255)
     blog_meta_desc: Optional[str] = Field(None, max_length=500)
     blog_meta_keywords: Optional[str] = Field(None, max_length=500)
-    blog_published_at: Optional[datetime] = None
-    # status: Literal["draft", "published", "inactive", "archived"] = "published"
-
+    # blog_published_at: Optional[datetime] = None 
+    # tags: list[BlogTagMap] = []
+    status: str = "published"
+    tags: list[int] = []
     @field_validator("blog_slug")
     @classmethod
     def validate_slug(cls, v: str):
@@ -86,7 +91,7 @@ class BlogUpdate(BaseModel):
     blog_meta_desc: Optional[str] = Field(None, max_length=500)
     blog_meta_keywords: Optional[str] = Field(None, max_length=500)
     blog_published_at: Optional[datetime] = None 
-
+    tags: list[int] = []
     @field_validator("blog_slug")
     @classmethod
     def validate_slug(cls, v: str):

@@ -317,7 +317,7 @@ export default function AddProduct() {
               <div className="ap-f">
                 <label className="ap-lbl">URL slug <span className="ap-req">*</span></label>
                 <div className={`ap-plink${errors.url ? " ap-has-err" : ""}`}>
-                  <span className="ap-plink-pre">/products/</span>
+                  <span className="ap-plink-pre">/detail/</span>
                   <input
                     className="ap-in"
                     placeholder="auto-generated"

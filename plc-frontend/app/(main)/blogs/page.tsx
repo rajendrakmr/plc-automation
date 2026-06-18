@@ -19,11 +19,8 @@ export default function Blogs() {
                     { label: "Home", link: "/" },
                     { label: "Blogs" },
                 ]}
-            />
-
-            <BlogsSection />
-
-
+            /> 
+            <BlogsSection /> 
             <ContactUsSection />
         </main>
     );

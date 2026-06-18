@@ -9,6 +9,7 @@ import ResourceMegaMenuSection from "@/app/components/ResourceMegaMenuSection";
 import { useState } from "react";
 import { useFetchData } from "@/app/utils/useFetchData"; 
 import ExpandSearchSection from "../main-ui/ExpandSearchSection";
+import MobSearchSection from "../main-ui/MobSearchSection";
 
 interface Categories {
   category_id: number;
@@ -216,65 +217,7 @@ export default function Header() {
 
                 {/* RIGHT SEARCH */}
                 <div className="rk_nav_right">
-                  <ExpandSearchSection />
-                  {/* <div
-                    className={`rk_expand_search ${open ? "active" : ""
-                      }`}
-                    ref={wrapperRef}
-                  > 
-                    <div className="rk_expand_search_icon">
-                      <svg viewBox="0 0 20 20">
-                        <path d="M12.9 14.32a8 8 0 111.41-1.41l5.35 5.33-1.42 1.42-5.33-5.34zm-.82-1.16a6 6 0 10-8.49-8.49 6 6 0 008.49 8.49z" />
-                      </svg>
-                    </div> 
-                    <input
-                      type="text"
-                      placeholder="Search Part Number"
-                      value={query}
-                      onFocus={() => setOpen(true)}
-                      onChange={(e) => {
-                        setQuery(e.target.value);
-                        setOpen(true);
-                      }}
-                      className="rk_expand_search_input"
-                    />
-
-                    {open && (
-                      <div className="rk_expand_dropdown">
-                        {prdLoading ? (
-                          <div className="rk_expand_dropdown_item">
-                            Searching...
-                          </div>
-                        ) : (
-                          <>
-                            {products.length > 0 && (
-                              <div className="rk_expand_dropdown_title">
-                                Matching Results
-                              </div>
-                            )}
-
-                            <ul className="rk_expand_dropdown_list">
-                              {products.map((item, index) => (
-                                <li
-                                  key={item.product_id}
-                                  className="rk_expand_dropdown_item" 
-                                >
-                                  <span className="rk_expand_dot">
-                                    •
-                                  </span>
-                                  <span>{item.part_no}</span>
-                                  <span>{item.category.cat_name}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </div> */}
-
-
-
+                  <ExpandSearchSection /> 
                 </div>
 
               </ul>
@@ -305,17 +248,10 @@ export default function Header() {
 
           </div>
 
-          <div className="mob-search">
-            <input
-              type="text"
-              placeholder="Search part number..."
-            />
-          </div>
+          <MobSearchSection />
 
         </header>
-
-        {/* MOBILE OVERLAY */}
-        {/* MOBILE NAV */}
+ 
         <nav className={`mobile-nav ${isOpen ? "open" : ""}`}>
 
 

@@ -29,13 +29,13 @@ const menuSections = [
       // { label: "Brands", href: "/admin/brands", icon: Factory },
     ],
   },
-  // {
-  //   title: "Content",
-  //   items: [
-  //     { label: "Blog / Pages", href: "/admin/blogs", icon: FileText },
-  //     // { label: "Offers & Deals", href: "/admin/offers", icon: BarChart3 },
-  //   ],
-  // },
+  {
+    title: "Content",
+    items: [
+      { label: "Blog / Pages", href: "/admin/blogs", icon: FileText },
+      // { label: "Offers & Deals", href: "/admin/offers", icon: BarChart3 },
+    ],
+  },
   // {
   //   title: "System",
   //   items: [

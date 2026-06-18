@@ -3,12 +3,8 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import Link from "next/link";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { Product } from "@/app/types";
-
-interface QuoteFormProps {
-  product: Product;
-}
-
+ 
+ 
 interface FormData {
   name: string;
   phone: string;
@@ -16,7 +12,7 @@ interface FormData {
   message: string;
 }
 
-export default function QuoteForm({ product }: QuoteFormProps) {
+export default function ContactForm() {
   const [formData, setFormData] = useState<FormData>({
     name: "",
     phone: "",
@@ -38,16 +34,14 @@ export default function QuoteForm({ product }: QuoteFormProps) {
     setLoading(true);
     setError("");
     setSuccess(false);
+    setError("Please wait for next update...");
+    return
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/enquiries`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          product_id: product.product_id,
-          category_id: product.category.category_id,
-          part_number: product.part_no,
-          manufacturer: product.category.cat_name,
+        body: JSON.stringify({ 
           quantity: 1,
           customer_name: formData.name,
           company_name: "",
@@ -77,10 +71,7 @@ export default function QuoteForm({ product }: QuoteFormProps) {
     <div className="quoteform">
       <div className="quote-header">
         <p>
-          <span>Get a quick quote for </span>
-          <span style={{ fontWeight: "normal" }}>
-            {product.category.cat_name} - {product.part_no}
-          </span>
+          <span>Get a quick quote for </span> 
         </p>
       </div>
       <div className="rfq-card">

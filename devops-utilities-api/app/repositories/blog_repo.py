@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session, joinedload,load_only
 from fastapi import HTTPException, status
 
 from typing import Optional, Tuple, List 
-from app.models.blog_model import Blog,BlogCategory,BlogTag
+from app.models.blog_model import Blog,BlogCategory,BlogTag,BlogTagMapping
 from app.schemas.blog_schema import BlogCreate,BlogUpdate
 
 
@@ -50,9 +50,6 @@ def list_feature(
     
     return blogs
 
-
- 
- 
 def list_all(
     db: Session,
     page: int,
@@ -105,9 +102,106 @@ def list_all(
     
     return blogs, total
 
+def get_all(
+    db: Session,
+    page: int,
+    limit: int,
+    search: Optional[str] = None,
+    blog_cat_id: Optional[int] = None,
+    url: Optional[str] = None,
+    status: Optional[str] = None,
+) -> tuple[list[Blog], int]:
 
+    query = db.query(Blog).options( 
+        load_only(
+            Blog.blog_id,
+            Blog.blog_img_url,
+            Blog.blog_title,
+            Blog.blog_slug,
+            Blog.blog_excerpt,
+            Blog.blog_content,
+            Blog.blog_published_at,
+            Blog.blog_meta_title,
+            Blog.blog_meta_keywords,
+            Blog.blog_meta_desc,     
+            Blog.blog_author,
+            Blog.status,            
+            Blog.blog_cat_id,      
+        ),
+        joinedload(Blog.category).load_only(
+            BlogCategory.blog_cat_id,
+            BlogCategory.blog_cat_name,
+        ),
+        joinedload(Blog.tags).load_only(
+            BlogTagMapping.blog_tag_id, 
+        ),
+    )
 
+    if blog_cat_id: 
+        query = query.filter(Blog.blog_cat_id == blog_cat_id)
 
+    if status:
+        query = query.filter(Blog.status == status)
+
+    if search:
+        search = f"%{search.lower()}%"
+        query = query.filter(
+            Blog.blog_title.ilike(search) |
+            Blog.blog_slug.ilike(search) |
+            Blog.blog_excerpt.ilike(search)
+        )
+
+    if url:   
+        query = query.filter(Blog.blog_slug == url)
+
+    total = query.count()
+
+    blogs = (
+        query
+        .order_by(Blog.blog_id.desc())
+        .offset((page - 1) * limit)
+        .limit(limit)
+        .all()
+    )
+
+    return blogs, total
+ 
+def get_by_slug(db: Session, url: str) -> Blog | None:
+    return db.query(Blog).filter(Blog.blog_slug == url).first()
+
+def get_by_title(db: Session, title: str) -> Blog | None:
+    return db.query(Blog).filter(Blog.blog_title == title).first()
+
+def create(db: Session, payload: BlogCreate) -> Blog: 
+    tag_ids = payload.tags 
+    blog_data = payload.model_dump(exclude={"tags"}) 
+    blog = Blog(**blog_data)
+    db.add(blog)
+    db.flush()    
+    for tag_id in tag_ids:
+        mapping = BlogTagMapping(blog_id=blog.blog_id, blog_tag_id=tag_id)
+        db.add(mapping) 
+    db.commit()
+    db.refresh(blog)
+    return blog
+
+def update(db: Session, blog_id: int, payload: BlogUpdate) -> Blog:
+    blog = db.query(Blog).filter(Blog.blog_id == blog_id).first()
+    if not blog:
+        raise HTTPException(status_code=404, detail="Blog not found")
+
+    tag_ids = payload.tags
+    blog_data = payload.model_dump(exclude={"tags"}, exclude_unset=True) 
+    for key, val in blog_data.items():
+        setattr(blog, key, val) 
+    db.query(BlogTagMapping).filter(BlogTagMapping.blog_id == blog_id).delete()
+    for tag_id in tag_ids:
+        mapping = BlogTagMapping(blog_id=blog_id, blog_tag_id=tag_id)
+        db.add(mapping)
+
+    db.commit()
+    db.refresh(blog)
+    return blog
 
 def list_all_cat(
     db: Session, 
@@ -169,147 +263,4 @@ def list_all_tag(
     
     return cats
 
-# from app.models.category import Category
-# from app.models.product_type import ProductType 
  
-
-# def get_all(
-#     db: Session,
-#     page: int,
-#     limit: int,
-#     category_id: Optional[int] = None,
-#     search: Optional[str] = None,
-#     product_type_id: Optional[int] = None,
-#     stock: Optional[str] = None,
-#     status: Optional[str] = None
-# ) -> tuple[list[Blog], int]:
-
-#     query = db.query(Blog) 
-#     query = query.options(
-#         joinedload(Blog.category),
-#         joinedload(Blog.product_type),
-#         joinedload(Blog.meta)
-#     )
-     
-#     if category_id is not None:
-#         query = query.filter(Blog.category_id == category_id)
-
-#     if product_type_id is not None:
-#         query = query.filter(Blog.product_type_id == product_type_id)
-
-#     if stock:
-#         query = query.filter(Blog.stock == stock)
-
-#     if status:
-#         query = query.filter(Blog.status == status)
- 
-#     if search:
-#         search = f"%{search.lower()}%"
-#         query = query.filter(
-#             Blog.part_no.ilike(search) |
-#             Blog.url.ilike(search) |
-#             Blog.short_desc.ilike(search)
-#         )
-
-#     # total BEFORE pagination
-#     total = query.count()
-
-#     # pagination
-#     products = (
-#         query
-#         .order_by(Blog.product_id.desc())
-#         .offset((page - 1) * limit)
-#         .limit(limit)
-#         .all()
-#     )
-
-#     return products, total
- 
- 
-# def get_by_slug(db: Session, part_no: str) -> Product | None:
-#     return db.query(Product).filter(Product.part_no == part_no).first()
-
-
-# def get_by_slug(db: Session, url: str) -> Product | None:
-#     return db.query(Product).filter(Product.url == url).first()
-
-# def create(db: Session, payload: ProductCreate) -> Product:
-#     product = Product(**payload.model_dump())
-#     db.add(product)
-#     db.commit()
-#     db.refresh(product)
-#     return product
-
-# from app.models.products import Product
-# from app.models.product_meta import ProductMeta
-
-
-# def create(db: Session, payload: ProductCreate) -> Product:
-
-#     data = payload.model_dump(exclude={"meta"})
-
-#     product = Product(**data)
-
-#     db.add(product)
-#     db.flush()  # product_id generate ho jayega
-
-#     for item in payload.meta:
-#         meta = ProductMeta(
-#             product_id=product.product_id,
-#             meta_key=item.meta_key,
-#             meta_title=item.meta_title,
-#             meta_desc=item.meta_desc,
-#         )
-#         db.add(meta)
-
-#     db.commit()
-#     db.refresh(product)
-
-#     return product
-
-# # update product
-# def update(
-#     db: Session,
-#     product_id: int,
-#     payload: ProductUpdate
-# ) -> Product:
-
-#     product = (
-#         db.query(Product)
-#         .filter(Product.product_id == product_id)
-#         .first()
-#     )
-
-#     if not product:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
-#             detail={"errors": {"product_id": "Product not found"}}
-#         )
-
-#     data = payload.model_dump(
-#         exclude_unset=True,
-#         exclude={"meta"}
-#     )
-
-#     for key, value in data.items():
-#         setattr(product, key, value)
-
-#     db.commit()
-#     db.refresh(product)
-
-#     return product
-
-
-
-# def delete(db: Session, product_id: int) -> None:
-#     product = db.query(Product).filter(Product.id == product_id).first()
-#     if not product:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
-#             detail={"errors": {"product_id": "Product not found"}}
-#         )
-    
-#     db.delete(product)
-#     db.commit()
-
-

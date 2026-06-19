@@ -4,6 +4,7 @@ import JobOpeningSection from "@/app/components/sections/JobOpeningSection";
 export const metadata = {
   title: "Careers",
   description: "Reach out to PLC Automation Group through our contact page. Connect with our experts to discuss tailored industrial solutions that enhance productivity and efficiency. Let's transform your processes together.",
+   keywords: "PLC AUTOMATION PTE LTD",
 };
 
 export default function CareersPage() {

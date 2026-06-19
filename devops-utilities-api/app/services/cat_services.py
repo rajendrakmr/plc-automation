@@ -10,11 +10,18 @@ def fetch_categories(db: Session,
         limit: Optional[int] = None,
         search: Optional[str] = None,
         category_id: Optional[int] = None,
-        type: Optional[str] = None
+        url: Optional[str] = None
         ) -> dict:
-    records = category_repo.get_all(db,limit,search,category_id,type) 
+    records = category_repo.get_all(db,limit,search,category_id,url) 
     return records
 
+def feature_categories(db: Session, 
+        limit: Optional[int] = None,
+        search: Optional[str] = None, 
+        type: Optional[str] = None
+        ) -> dict:
+    records = category_repo.get_feature_categories(db,limit,search,type) 
+    return records
 
 def get_svc_all(db: Session, 
         limit: Optional[str] = None,

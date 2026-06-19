@@ -55,15 +55,19 @@ class CatPageResponse(BaseModel):
     category_id: int 
     cat_name: str
     cat_slug: str 
+    image_url: str 
     class Config:
         from_attributes = True
 
-class CateResp(BaseModel):
+class CateResp(BaseModel): 
     category_id: int 
     cat_name: str
     cat_slug: str
     cat_desc: str 
     image_url: str
+    meta_title:str
+    meta_keywords:str
+    meta_description:str
     class Config:
         from_attributes = True
 

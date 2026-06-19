@@ -10,6 +10,7 @@ import Image from "next/image";
 
 export const metadata = {
   title: "About PLC Automation Group - Innovating Industrial Solutions",
+  keywords:"PLC AUTOMATION PTE LTD",
   description: "Discover PLC Automation Group's expertise in industrial automation. We specialize in cutting-edge solutions for enhanced productivity and efficiency. Learn more about our journey today.",
 };
 

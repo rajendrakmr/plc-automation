@@ -8,11 +8,14 @@ from sqlalchemy import (
     Integer,
     func,
     Index,
+    BigInteger
 )
+# from sqlalchemy import Column, BigInteger, String
 from sqlalchemy.dialects.mysql import BIGINT
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 
+ 
 
 class Blog(Base):
     __tablename__ = "plc_trn_blogs"
@@ -24,7 +27,7 @@ class Blog(Base):
         nullable=False,
         index=True,
     )
-    type = Column(String(11), nullable=True)
+    # type = Column(String(11), nullable=True)
     blog_title = Column(String(255), nullable=False)
     blog_slug = Column(String(255), nullable=False, unique=True)
     blog_excerpt = Column(String(500), nullable=True)
@@ -47,7 +50,8 @@ class Blog(Base):
 
     # Relationships
     category = relationship("BlogCategory", back_populates="blogs")
-    tags = relationship("BlogTagMapping", back_populates="blogs")
+    tags = relationship("BlogTagMapping", back_populates="blogs") 
+    references = relationship("BlogRefMapping", back_populates="blogs")
     tag_mappings = relationship("BlogTagMapping") 
     __table_args__ = (
         Index("idx_blog_cat_status", "blog_cat_id", "status"),
@@ -98,3 +102,17 @@ class BlogTagMapping(Base):
         index=True,
     )
     blogs = relationship("Blog", back_populates="tags")
+    
+    
+class BlogRefMapping(Base):
+    __tablename__ = "plc_trn_blog_references" 
+    blog_ref_id = Column(BIGINT(unsigned=True), primary_key=True, autoincrement=True)
+    ref_title = Column(String(255), nullable=False)
+    ref_url = Column(String(255), nullable=False)
+    blog_id = Column(
+        BIGINT(unsigned=True),
+        ForeignKey("plc_trn_blogs.blog_id"),
+        nullable=False,
+        index=True,
+    ) 
+    blogs = relationship("Blog", back_populates="references")

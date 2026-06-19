@@ -1,23 +1,29 @@
 "use client";
-
 import Image from "next/image";
-import Link from "next/link"; 
-export default function BrandMegaMenuSection({popularBrands}: {popularBrands: {category_id: number;
-    cat_name: string;
-    cat_slug: string;}[]}) {
- 
+import Link from "next/link";
+export default function BrandMegaMenuSection({ popularBrands }: {
+    popularBrands: {
+        category_id: number;
+        cat_name: string;
+        cat_slug: string;
+    }[]
+}) {
     return (
         <div className="rk_mega_dropdown">
             <div className="rk_mega_wrap">
-                <div className="rk_mega_inner"> 
+                <div className="rk_mega_inner">
                     <div className="rk_mega_left">
                         <p className="rk_mega_left_title">
                             Most popular
-                        </p> 
+                        </p>
                         <ul className="rk_mega_brand_list">
-                            {popularBrands.slice(0, 9).map((brand) => (
-                                <li key={`/brands/${brand.cat_slug}`}>
+                            {popularBrands.map((brand) => (
+                                <li key={`/brands/${brand.category_id}`}>
                                     <Link
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            window.location.href = `/brands/${brand.cat_slug}`;
+                                        }}
                                         href={`/brands/${brand.cat_slug}`}
                                         className="rk_mega_brand_link"
                                     >
@@ -29,6 +35,10 @@ export default function BrandMegaMenuSection({popularBrands}: {popularBrands: {c
                             <li>
                                 <Link
                                     href="/brands"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        window.location.href = `/brands`;
+                                    }}
                                     className="rk_mega_view_all"
                                 >
                                     View all manufacturers
@@ -47,6 +57,10 @@ export default function BrandMegaMenuSection({popularBrands}: {popularBrands: {c
                         <div className="rk_mega_cards_grid">
                             {popularBrands.slice(0, 8).map((brand) => (
                                 <Link
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        window.location.href = `/brands/${brand.cat_slug}`;
+                                    }}
                                     href={`/brands/${brand.cat_slug}`}
                                     key={brand.category_id}
                                     className="rk_mega_card"

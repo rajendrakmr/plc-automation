@@ -4,7 +4,7 @@ import { useFetchData } from "@/app/utils/useFetchData";
 import Image from "next/image";
 import Link from "next/link";
 
- 
+
 interface Categories {
   category_id: number;
   cat_name: string;
@@ -15,10 +15,9 @@ interface Categories {
 export default function ManufacturersSection() {
 
   const { data: manufacturers, loading: catLoading } = useFetchData<Categories[]>({
-    url: '/categories/list',
+    url: '/categories/feature',
     params: {
-      limit: 10,
-      type: 'h'
+      type: 'home'
     },
 
   });
@@ -39,8 +38,6 @@ export default function ManufacturersSection() {
             View all manufacturers
           </Link>
         </div>
-
-        {/* RIGHT GRID */}
         <div className="manufacturers-grid">
           {manufacturers?.map((item) => (
             <>

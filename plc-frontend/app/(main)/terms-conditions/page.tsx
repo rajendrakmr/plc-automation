@@ -6,6 +6,7 @@ import ContactUsSection from "@/app/components/ContactUsSection";
 export const metadata = {
     title: "Terms and Conditions",
     description: "Explore the Terms and Conditions of PLC Automation Group to understand the guidelines governing the use of our website, products, and services. Learn about your rights and responsibilities as a user, including information on product warranties, returns, and limitations of liability.",
+     keywords: "PLC AUTOMATION PTE LTD",
 };
 
 export default function TermsConditions() {

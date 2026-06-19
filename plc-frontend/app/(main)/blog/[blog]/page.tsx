@@ -66,8 +66,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
 }
 
-export default async function Blog({ params }: Props) {
-    
+export default async function Blog({ params }: Props) { 
     const { blog } = await params;
     const blogs = await getBlog(blog);
     if (!blogs) notFound();

@@ -36,6 +36,7 @@ interface BlogForm {
   blog_meta_keywords?: string;
   blog_meta_desc?: string;
   status: "published" | "draft";
+  references: RefField[]
 }
 
 interface FormErrors {
@@ -46,6 +47,13 @@ interface FormErrors {
   blog_content?: string;
 }
 
+
+
+interface RefField {
+  ref_id?: string;
+  ref_title?: string;
+  ref_url?: string;
+}
 // ─── Defaults ─────────────────────────────────────────────────────────────────
 
 const EMPTY_FORM: BlogForm = {
@@ -59,6 +67,8 @@ const EMPTY_FORM: BlogForm = {
   blog_meta_keywords: "",
   blog_meta_desc: "",
   status: "published",
+  references: [{ ref_id: "", ref_title: "", ref_url: "" }]
+
 };
 
 // ─── Validation ───────────────────────────────────────────────────────────────
@@ -175,6 +185,23 @@ export default function AddBlog() {
 
   const cls = (base: string, errKey: keyof FormErrors) => `${base}${errors[errKey] ? " ap-has-err" : ""}`;
 
+
+
+  const addMeta = () =>
+    set("references", [
+      ...form.references,
+      {
+        ref_id: Date.now().toString(),
+        ref_title: "",
+        ref_url: "",
+      },
+    ]);
+  const updateMeta = (id: string | any, field: keyof RefField, val: string) =>
+    set("references", form.references.map(m => m.ref_id === id ? { ...m, [field]: val } : m));
+
+  const removeMeta = (id: string | any) =>
+    set("references", form.references.filter(m => m.ref_id !== id));
+
   return (
     <>
       <div className="ap-wrap">
@@ -284,6 +311,23 @@ export default function AddBlog() {
                   onChange={e => set("blog_meta_desc", e.target.value)}
                 />
               </div>
+            </Card>
+
+
+            <Card title="References">
+              <div className="ap-ref-hd">
+                <span>reference title</span>
+                <span>reference url</span>
+                <span />
+              </div>
+              {form.references.map(m => (
+                <div key={m.ref_id} className="ap-ref-row">
+                  <input className="ap-in" style={{ fontSize: 12.5 }} placeholder="e.g." value={m.ref_title} onChange={e => updateMeta(m.ref_id, "ref_title", e.target.value)} />
+                  <input className="ap-in" style={{ fontSize: 12.5 }} placeholder="e.g." value={m.ref_url} onChange={e => updateMeta(m.ref_id, "ref_url", e.target.value)} />
+                  <button className="ap-meta-del" onClick={() => removeMeta(m.ref_id)} title="Remove row">×</button>
+                </div>
+              ))}
+              <button className="ap-add-meta" onClick={addMeta}>+ Add row</button>
             </Card>
           </div>
 

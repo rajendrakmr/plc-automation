@@ -1,16 +1,15 @@
-  
+
 import Image from "next/image";
-import BrandPartnerSection from "@/app/components/main-ui/BrandPartnerSection"; 
+import BrandPartnerSection from "@/app/components/main-ui/BrandPartnerSection";
 import ManufacturersSection from "@/app/components/main-ui/ManufacturersSection";
-import ContactUsSection from "@/app/components/ContactUsSection"; 
+import ContactUsSection from "@/app/components/ContactUsSection";
 import HeroBannerSection from "@/app/components/main-ui/HeroBannerSection";
 import TrustBadgeSection from "@/app/components/main-ui/TrustBadgeSection";
 import BlogLatestSection from "../components/BlogLatestSection";
-// import BlogLatestSection from "@/app/components/BlogLatestSection";
-
 export const metadata = {
-  title: "PLC Automation Group – Your Global Partner for Industrial Automation & PLC Solutions",
-  description: "Empowering Industries Worldwide. PLC Automation Group is a trusted global supplier of industrial automation spare parts, specializing in both new and obsolete PLC components. From Australia to across the globe, we provide reliable automation solutions that keep your systems running efficiently.",
+  title: "Global Industrial Automation Parts: Best Management, Quality Spares, Buy/Sell in Australia - Plc Automation Group Australia",
+  description: "Optimize Your Operations with the Best Spare Parts Management. Buy Quality Industrial Automation Parts Globally. Find, Buy, and Sell Automation Parts in Australia. Get Reliable Automation Spare Parts in Australia. Seamless Supply of New and Obsolete Automation Spare Parts for Your Business. ? Automate Brilliance ? Rocket Your Efficiency",
+  keywords: "Automation Spares, Mro,Industrial Automation Parts, Siemens, Allen- Bradley ,Omron , ABB , PLC Automation Group Australia , PLC Automation",
 };
 
 export default function Home() {
@@ -51,10 +50,10 @@ export default function Home() {
             </span>
 
           </div>
-        ))} 
+        ))}
 
       </div>
-      <ManufacturersSection /> 
+      <ManufacturersSection />
       <BrandPartnerSection />
 
       <section className="section_white_content">
@@ -77,8 +76,8 @@ export default function Home() {
 
             {/* FEATURES */}
             <div className="mmp-features">
-                <TrustBadgeSection />
-               
+              <TrustBadgeSection />
+
             </div>
           </div>
 
@@ -93,7 +92,7 @@ export default function Home() {
                 playsInline
                 preload="metadata"
               >
-               <source
+                <source
                   src="/assets/plc_automation/plcautomation-animation-video.mp4"
                   type="video/mp4"
                 />
@@ -102,7 +101,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-      
+
 
 
       <BlogLatestSection />

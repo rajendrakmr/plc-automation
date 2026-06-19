@@ -2,8 +2,7 @@
 
 import BreadCrumbsSection from "@/app/components/BredCrumbsSection";
 import ContactUsSection from "@/app/components/ContactUsSection";
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import Image from "next/image"; 
 import PopularBlogSection from "@/app/components/PopularBlogSection";
 import Reference from "@/app/components/main-ui/Reference"; 
 import "@/app/components/css/blogs.css";
@@ -44,36 +43,27 @@ export default function BlogDetail({ blog }: Props) {
                     { label: blog.category.blog_cat_name },
                 ]}
             />
-            <section className="section_grey_content">
-
-                <div className="section_container blogx_container" style={{ paddingTop: "0px" }}>
-
-
-                    <div className="blogx_left">
-
+            <section className="section_grey_content"> 
+                <div className="section_container blogx_container" style={{ paddingTop: "0px" }}> 
+                    <div className="blogx_left"> 
                         <Image
                             src="/assets/engineering-services-4.jpg"
                             alt={blog.blog_title}
                             width={900}
                             height={450}
                             className="blogx_main_img"
-                        />
-
+                        /> 
                         <div className="blogx_meta">
                             <span>{blog.category.blog_cat_name}</span>
                             <span>By {blog.blog_author}</span> 
-                        </div>
-
-                        <h1 className="blogx_title">{blog.blog_title}</h1>
-
-                        <div className="blogx_content">
-
+                        </div> 
+                        <h1 className="blogx_title">{blog.blog_title}</h1> 
+                        <div className="blogx_content"> 
                             {
                                 blog.blog_content && <div 
                                     dangerouslySetInnerHTML={{ __html: blog.blog_content }}
                                 />
-                            }
-
+                            } 
                              <Reference />
                         </div>
 

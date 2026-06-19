@@ -3,11 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { resources } from "@/app/data/content";
-import { usePathname } from "next/navigation"; 
+import { usePathname } from "next/navigation";
 import BrandMegaMenuSection from "@/app/components/BrandMegaMenuSection";
 import ResourceMegaMenuSection from "@/app/components/ResourceMegaMenuSection";
 import { useState } from "react";
-import { useFetchData } from "@/app/utils/useFetchData"; 
+import { useFetchData } from "@/app/utils/useFetchData";
 import ExpandSearchSection from "../main-ui/ExpandSearchSection";
 import MobSearchSection from "../main-ui/MobSearchSection";
 
@@ -15,6 +15,7 @@ interface Categories {
   category_id: number;
   cat_name: string;
   cat_slug: string;
+  image_url: string;
 }
 
 export interface BlogCategory {
@@ -41,13 +42,12 @@ function truncate(str: string, words = 5) {
   const w = str.trim().split(/\s+/);
   return w.length <= words ? str : w.slice(0, words).join(" ") + "...";
 }
-
-
  
+
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
-  const [open, setOpen] = useState(false); 
+  const [open, setOpen] = useState(false);
   const { data: BLOGS, loading: BlogLoading } = useFetchData<Blog[]>({
     url: '/blogs/feature',
     params: {
@@ -65,7 +65,11 @@ export default function Header() {
     document.body.style.overflow = "";
   };
   const { data: categories, loading: catLoading } = useFetchData<Categories[]>({
-    url: '/categories/list'
+    url: '/categories/feature?type=mega',
+    params: {
+      limit: 10,
+      type: "mega"
+    },
   });
   const toggleMobileNav = () => {
     setIsOpen((prev) => {
@@ -74,8 +78,8 @@ export default function Header() {
     });
   };
 
- 
- 
+
+
   return (
     <>
       <div className="topbar">
@@ -217,7 +221,7 @@ export default function Header() {
 
                 {/* RIGHT SEARCH */}
                 <div className="rk_nav_right">
-                  <ExpandSearchSection /> 
+                  <ExpandSearchSection />
                 </div>
 
               </ul>
@@ -251,7 +255,7 @@ export default function Header() {
           <MobSearchSection />
 
         </header>
- 
+
         <nav className={`mobile-nav ${isOpen ? "open" : ""}`}>
 
 

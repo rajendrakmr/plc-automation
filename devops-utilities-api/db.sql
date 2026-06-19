@@ -389,3 +389,22 @@ CREATE TABLE plc_trn_blog_tag_map (
         ON DELETE CASCADE ON UPDATE CASCADE
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ 
+CREATE TABLE plc_trn_blog_references (
+    blog_ref_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    blog_id BIGINT UNSIGNED NOT NULL,
+    ref_title VARCHAR(255),
+    ref_url VARCHAR(255),
+
+    CONSTRAINT fk_blog_references_blog_id
+    FOREIGN KEY (blog_id)
+    REFERENCES plc_trn_blogs (blog_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+

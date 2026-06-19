@@ -6,6 +6,7 @@ import "@/app/components/css/product.css"
 export const metadata = {
     title: "Disclaimer - Understanding Our Website Information",
     description: "Explore our Disclaimer to comprehend the nature of information on PLC Automation Group's website. Learn about the limitations of content accuracy and the responsible use of the provided information.",
+    keywords: "PLC AUTOMATION PTE LTD",
 };
 
 export default function Disclaimer() {
@@ -21,7 +22,7 @@ export default function Disclaimer() {
             />
 
             <section className="section_grey_content">
-                <div className="section_container"  style={{paddingTop:"0px"}}>
+                <div className="section_container" style={{ paddingTop: "0px" }}>
 
                     {/* LEFT */}
                     <div className="pd-left">
@@ -34,7 +35,7 @@ export default function Disclaimer() {
 
                     </div>
 
-                     
+
 
                 </div>
             </section>

@@ -2,53 +2,88 @@ from sqlalchemy.orm import Session, joinedload,load_only
 from fastapi import HTTPException, status
 
 from typing import Optional, Tuple, List 
-from app.models.blog_model import Blog,BlogCategory,BlogTag,BlogTagMapping
+from app.models.blog_model import Blog,BlogCategory,BlogTag,BlogTagMapping,BlogRefMapping
 from app.schemas.blog_schema import BlogCreate,BlogUpdate
-
-
+from app.models.feature_type import FeatureType
 
 def list_feature(
-    db: Session, 
-    limit: int, 
-    search: Optional[str] = None, 
+    db: Session,
+    limit: int,
+    search: Optional[str] = None,
     type: Optional[str] = None
 ) -> tuple[list[Blog], int]:
-     
-    query = db.query(Blog) 
-    if type:
-        query = query.filter(Blog.type == type) 
-    if search: 
-        query = query.filter(
-            Blog.blog_title.ilike(f"%{search}%")
-        )
-
-  
-    blogs = (
-        query.options(
+    query = db.query(Blog).options(
             load_only(
                 Blog.blog_id, 
                 Blog.blog_img_url, 
                 Blog.blog_title,
                 Blog.blog_slug, 
                 Blog.blog_excerpt,
-                Blog.blog_content,
-                Blog.blog_published_at,
-                Blog.blog_meta_title, 
-                Blog.blog_meta_keywords,
-                Blog.blog_meta_desc, 
-                Blog.blog_author,
-            ),
-            joinedload(Blog.category).load_only(
-                BlogCategory.blog_cat_id,
-                BlogCategory.blog_cat_name,
-            )
+                Blog.blog_published_at
+            ), 
         )
-        .order_by(Blog.blog_id.asc())  
-        .limit(limit)
-        .all() 
-    )
-    
+
+    if search:
+        query = query.filter(
+            Blog.blog_title.ilike(f"%{search}%")
+        )
+
+    if type:  
+        feature_ids = (
+            db.query(FeatureType.id)
+            .filter(
+                FeatureType.types == type,
+                FeatureType.feature_type == 'blog',
+                FeatureType.status == "active",
+            )
+            .subquery()
+        )
+        query = query.filter(Blog.blog_id.in_(feature_ids))
+ 
+    blogs = query.limit(limit).all()
+
     return blogs
+
+# def list_feature(
+#     db: Session, 
+#     limit: int, 
+#     search: Optional[str] = None, 
+#     type: Optional[str] = None
+# ) -> tuple[list[Blog], int]:
+     
+#     query = db.query(Blog)  
+#     if search: 
+#         query = query.filter(
+#             Blog.blog_title.ilike(f"%{search}%")
+#         )
+
+  
+    # blogs = (
+    #     query.options(
+    #         load_only(
+    #             Blog.blog_id, 
+    #             Blog.blog_img_url, 
+    #             Blog.blog_title,
+    #             Blog.blog_slug, 
+    #             Blog.blog_excerpt,
+    #             Blog.blog_content,
+    #             Blog.blog_published_at,
+    #             Blog.blog_meta_title, 
+    #             Blog.blog_meta_keywords,
+    #             Blog.blog_meta_desc, 
+    #             Blog.blog_author,
+    #         ),
+    #         joinedload(Blog.category).load_only(
+    #             BlogCategory.blog_cat_id,
+    #             BlogCategory.blog_cat_name,
+    #         )
+    #     )
+    #     .order_by(Blog.blog_id.asc())  
+    #     .limit(limit)
+    #     .all() 
+    # )
+    
+#     return blogs
 
 def list_all(
     db: Session,
@@ -70,9 +105,7 @@ def list_all(
     if search: 
         query = query.filter(
             Blog.blog_title.ilike(f"%{search}%")
-        )
-
- 
+        ) 
     total = query.count() 
     blogs = (
         query.options(
@@ -92,7 +125,12 @@ def list_all(
             joinedload(Blog.category).load_only(
                 BlogCategory.blog_cat_id,
                 BlogCategory.blog_cat_name,
-            )
+            ),
+             joinedload(Blog.references).load_only(
+            BlogRefMapping.blog_ref_id, 
+            BlogRefMapping.ref_title, 
+            BlogRefMapping.ref_url, 
+        ),
         )
         .order_by(Blog.blog_id.desc())
         .offset((page - 1) * limit)
@@ -135,6 +173,11 @@ def get_all(
         joinedload(Blog.tags).load_only(
             BlogTagMapping.blog_tag_id, 
         ),
+        joinedload(Blog.references).load_only(
+            BlogRefMapping.blog_ref_id, 
+            BlogRefMapping.ref_title, 
+            BlogRefMapping.ref_url, 
+        ),
     )
 
     if blog_cat_id: 
@@ -172,19 +215,55 @@ def get_by_slug(db: Session, url: str) -> Blog | None:
 def get_by_title(db: Session, title: str) -> Blog | None:
     return db.query(Blog).filter(Blog.blog_title == title).first()
 
-def create(db: Session, payload: BlogCreate) -> Blog: 
-    tag_ids = payload.tags 
-    blog_data = payload.model_dump(exclude={"tags"}) 
-    blog = Blog(**blog_data)
-    db.add(blog)
-    db.flush()    
-    for tag_id in tag_ids:
-        mapping = BlogTagMapping(blog_id=blog.blog_id, blog_tag_id=tag_id)
-        db.add(mapping) 
-    db.commit()
-    db.refresh(blog)
-    return blog
+# def create(db: Session, payload: BlogCreate) -> Blog: 
+#     tag_ids = payload.tags 
+#     blog_data = payload.model_dump(exclude={"tags"}) 
+#     blog = Blog(**blog_data)
+#     db.add(blog)
+#     db.flush()    
+#     for tag_id in tag_ids:
+#         mapping = BlogTagMapping(blog_id=blog.blog_id, blog_tag_id=tag_id)
+#         db.add(mapping) 
+#     db.commit()
+#     db.refresh(blog)
+#     return blog
 
+
+
+
+def create(db: Session, payload: BlogCreate) -> Blog:
+    tag_ids = payload.tags
+    references = payload.references
+
+    blog_data = payload.model_dump(exclude={"tags", "references"})
+    blog = Blog(**blog_data)
+
+    try:
+        db.add(blog)
+        db.flush() 
+        if tag_ids:
+            db.add_all([
+                BlogTagMapping(blog_id=blog.blog_id, blog_tag_id=tag_id)
+                for tag_id in tag_ids
+            ])
+
+        if references:
+            db.add_all([
+                BlogRefMapping(
+                    blog_id=blog.blog_id,
+                    ref_title=ref.ref_title,
+                    ref_url=ref.ref_url,
+                )
+                for ref in references
+            ])
+
+        db.commit()
+        db.refresh(blog)
+        return blog 
+    except Exception:
+        db.rollback()
+        raise
+    
 def update(db: Session, blog_id: int, payload: BlogUpdate) -> Blog:
     blog = db.query(Blog).filter(Blog.blog_id == blog_id).first()
     if not blog:

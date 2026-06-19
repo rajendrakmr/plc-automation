@@ -6,6 +6,7 @@ import ContactForm from "@/app/components/main-ui/ContactForm";
 export const metadata = {
   title: "Contact Us - Get in Touch for Industrial Solutions",
   description: "Reach out to PLC Automation Group through our contact page. Connect with our experts to discuss tailored industrial solutions that enhance productivity and efficiency. Let's transform your processes together.",
+  keywords:"PLC AUTOMATION PTE LTD"
 };
 
 export default function ContactUs() {

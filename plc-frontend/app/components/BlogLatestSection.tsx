@@ -20,7 +20,7 @@ export interface Blog {
   blog_published_at: string | null;
   blog_img_url: string;
   blog_author: string;
-  category: BlogCategory;
+  // category: BlogCategory;
 }
 
 export default function BlogLatestSection() {
@@ -28,7 +28,7 @@ export default function BlogLatestSection() {
     url: '/blogs/feature',
     params: {
       limit: 3,
-      type: "h"
+      type: "mega"
     },
 
   });
@@ -61,7 +61,7 @@ export default function BlogLatestSection() {
                   alt={slide.blog_title}
                   className={styles.rkb_image}
                 />
-                <span className={styles.rkb_badge}>{slide.category.blog_cat_name}</span>
+                {/* <span className={styles.rkb_badge}>{slide.category.blog_cat_name}</span> */}
               </div>
               <div className={styles.rkb_cardBody}>
                 <div className={styles.rkb_meta}> 

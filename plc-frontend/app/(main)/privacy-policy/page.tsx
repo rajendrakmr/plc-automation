@@ -7,6 +7,7 @@ import ContactUsSection from "@/app/components/ContactUsSection";
 export const metadata = {
     title: "Privacy Commitment - Safeguarding Your Information",
     description: "Read our Privacy Policy to understand how PLC Automation Group safeguards your data. Learn about our commitment to maintaining the security and confidentiality of your personal information.",
+     keywords: "PLC AUTOMATION PTE LTD",
 };
 
 export default function PrivacyPolicy() {

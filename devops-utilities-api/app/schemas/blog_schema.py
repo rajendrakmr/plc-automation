@@ -1,4 +1,3 @@
- 
 # schemas/blog_schema.py
 
 from pydantic import BaseModel, Field, field_validator
@@ -6,6 +5,7 @@ from typing import Optional, Literal
 from datetime import datetime
 import re
 
+BlogStatus = Literal["published", "draft"]
 
 # ─────────────────────────────────────────
 # Blog Category
@@ -20,10 +20,6 @@ class BlogCategoryResponse(BaseModel):
         from_attributes = True
 
 
-
-class BlogTagMap(BaseModel): 
-    blog_tag_id: str | None = None
-    
 # ─────────────────────────────────────────
 # Blog Tag
 # ─────────────────────────────────────────
@@ -32,6 +28,26 @@ class BlogTagResponse(BaseModel):
     blog_tag_name: str
     blog_tag_slug: str
     status: int
+
+    class Config:
+        from_attributes = True
+
+
+# ─────────────────────────────────────────
+# Blog References
+# ─────────────────────────────────────────
+class BlogRefCreate(BaseModel):
+    """Used when creating/updating — no IDs exist yet.""" 
+    ref_title: str = Field(..., max_length=255)
+    ref_url: str = Field(..., max_length=255)
+
+
+class BlogRefResponse(BaseModel):
+    """Used when returning data that already exists in the DB."""
+    blog_ref_id: int
+    blog_id: int
+    ref_title: str
+    ref_url: str
 
     class Config:
         from_attributes = True
@@ -53,10 +69,10 @@ class BlogCreate(BaseModel):
     blog_meta_title: Optional[str] = Field(None, max_length=255)
     blog_meta_desc: Optional[str] = Field(None, max_length=500)
     blog_meta_keywords: Optional[str] = Field(None, max_length=500)
-    # blog_published_at: Optional[datetime] = None 
-    # tags: list[BlogTagMap] = []
-    status: str = "published"
+    status: BlogStatus = "published"
     tags: list[int] = []
+    references: list[BlogRefCreate] = []
+
     @field_validator("blog_slug")
     @classmethod
     def validate_slug(cls, v: str):
@@ -90,11 +106,14 @@ class BlogUpdate(BaseModel):
     blog_meta_title: Optional[str] = Field(None, max_length=255)
     blog_meta_desc: Optional[str] = Field(None, max_length=500)
     blog_meta_keywords: Optional[str] = Field(None, max_length=500)
-    blog_published_at: Optional[datetime] = None 
+    blog_published_at: Optional[datetime] = None
+    status: Optional[BlogStatus] = None
     tags: list[int] = []
+    references: list[BlogRefCreate] = []
+
     @field_validator("blog_slug")
     @classmethod
-    def validate_slug(cls, v: str):
+    def validate_slug(cls, v: Optional[str]):
         if v is None:
             return v
         v = v.strip().lower()
@@ -104,7 +123,7 @@ class BlogUpdate(BaseModel):
 
     @field_validator("blog_title")
     @classmethod
-    def validate_title(cls, v: str):
+    def validate_title(cls, v: Optional[str]):
         if v is None:
             return v
         v = v.strip()
@@ -121,17 +140,17 @@ class BlogResponse(BaseModel):
     blog_cat_id: int
     blog_title: str
     blog_slug: str
-    blog_excerpt: Optional[str]
-    blog_content: Optional[str]
-    blog_img_url: Optional[str]
-    blog_author: Optional[str]
-    blog_tags: Optional[str]
+    blog_excerpt: Optional[str] = None
+    blog_content: Optional[str] = None
+    blog_img_url: Optional[str] = None
+    blog_author: Optional[str] = None
+    blog_tags: Optional[str] = None
     blog_sort: int
-    blog_meta_title: Optional[str]
-    blog_meta_desc: Optional[str]
-    blog_meta_keywords: Optional[str]
-    blog_published_at: Optional[datetime]
-    status: str
+    blog_meta_title: Optional[str] = None
+    blog_meta_desc: Optional[str] = None
+    blog_meta_keywords: Optional[str] = None
+    blog_published_at: Optional[datetime] = None
+    status: BlogStatus
     created_at: datetime
     updated_at: datetime
     category: Optional[BlogCategoryResponse] = None
@@ -149,49 +168,3 @@ class BlogListResponse(BaseModel):
     page: int
     limit: int
     total_pages: int
-from datetime import datetime
-
-
-
-class CategoryResponse(BaseModel):
-    category_id: int
-    name: str
-    cat_name: str
-    cat_desc: str
-
-    class Config:
-        from_attributes = True
-        
-class ProductTypeResponse(BaseModel):
-    product_type_id: int
-    name: str 
-    class Config:
-        from_attributes = True
-
-       
-class ProductResponse(BaseModel):
-    product_id: int 
-    category_id: int
-    product_type_id: int 
-    part_no: str
-    url: str
-    
-    # category: Optional[CategoryResponse] = None
-    # product_type: Optional[ProductTypeResponse] = None
-
-    short_desc: Optional[str]
-    product_desc: Optional[str]
-
-    image_url: Optional[str]
-
-    meta_title: Optional[str]
-    meta_keywords: Optional[str]
-    meta_description: Optional[str]
-
-    stock: str
-    status: str
-    # meta: list[ProductMetaCreate] = []
-
-    class Config:
-        from_attributes = True
- 

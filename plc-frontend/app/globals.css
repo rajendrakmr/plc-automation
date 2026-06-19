@@ -505,6 +505,7 @@ p {
   transform: translateY(10px);
   transition: opacity 0.25s ease, transform 0.25s ease;
   z-index: 999;
+  height: 90vh;
 }
 
 /* .rk_mega_dropdown {
@@ -5720,3 +5721,19 @@ p {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* .rk_has_mega .rk_mega_dropdown {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+
+.rk_has_mega:hover .rk_mega_dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+} */
+
+

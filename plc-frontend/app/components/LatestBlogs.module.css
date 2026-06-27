@@ -1,5 +1,4 @@
-/* LatestBlogs.module.css */
-
+ 
 .rkb_section {
     background-color: var(--grey);
     padding: 80px 0;
@@ -62,14 +61,13 @@
     overflow: hidden;
     text-decoration: none;
     color: inherit;
-    border: 1px solid var(--blue);
+    border: 1px solid #d4d4d4;
     transition: box-shadow 0.22s ease, transform 0.22s ease;
 }
 
 .rkb_card:hover {
-    box-shadow: 0 8px 28px rgba(26, 44, 78, 0.1);
-    transform: translateY(-4px);
-    border: 1px solid var(--white);
+    /* box-shadow: 0 8px 28px rgba(26, 44, 78, 0.1); */
+    transform: translateY(-4px); 
 }
 
 /* ---------- Image ---------- */
@@ -182,7 +180,7 @@
     font-size: 14px;
     font-weight: 600;
     color: var(--blue);
-    border: 2px solid var(--blue);
+    border: 1px solid #d4d4d4;
     padding: 11px 36px;
     border-radius: 6px;
     text-decoration: none;

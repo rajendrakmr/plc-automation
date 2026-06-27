@@ -8,7 +8,12 @@ export function getBlogImageUrl(imgUrl: string | null): string {
 }
 
 
-export function truncate(str: string, words = 5) {
+export function truncate(str?: string | null, words = 5): string {
+  if (!str) return "";
+
   const w = str.trim().split(/\s+/);
-  return w.length <= words ? str : w.slice(0, words).join(" ") + "...";
+
+  return w.length <= words
+    ? str
+    : `${w.slice(0, words).join(" ")}...`;
 }

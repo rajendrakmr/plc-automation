@@ -18,6 +18,7 @@ export interface Categories {
   category_id: number;
   cat_name: string;
   cat_desc: string;
+  cat_short_text: string;
   image_url: string;
   cat_slug: string;
   meta_title: string;
@@ -25,16 +26,14 @@ export interface Categories {
   meta_description: string;
 }
 
-function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, "").trim();
-}
+ 
 
 async function getCategories(brand: string): Promise<Categories[] | null> {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/categories/list?url=${brand}`,
       { cache: "no-store" }
-    );
+    ); 
     if (!res.ok) return null;
     const data: Categories[] = await res.json();
     if (!data || data.length === 0) return null;
@@ -67,9 +66,9 @@ export default async function Brands({ params }: Props) {
   const { brand } = await params;
   const categories = await getCategories(brand);
 
-  if (!categories) notFound();
+  if (!categories) notFound(); 
 
-  const category_id: number | null = categories[0]?.category_id ?? null;
+  const category: Categories | null = categories[0] ?? null;
   const formattedBrand = categories[0]?.cat_name || "";
   const description = categories[0]?.cat_desc || "";
 
@@ -86,11 +85,11 @@ export default async function Brands({ params }: Props) {
         ]}
       />
       <ProductAboutSection
-        products={{ title: formattedBrand, description: description }}
+        products={{ title: formattedBrand, description: description,cat_short_text: categories[0]?.cat_short_text }}
       />
-      <BrandDetailProduct cat_id={category_id} />
-      <PrdHeroBannerSection />
+      <BrandDetailProduct categories={category} />
       <ContactUsSection />
+      <PrdHeroBannerSection />
     </main>
   );
 }

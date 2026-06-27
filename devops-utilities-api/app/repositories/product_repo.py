@@ -15,6 +15,9 @@ def get_by_part(db: Session, part_no: str) -> Product | None:
 def get_by_slug(db: Session, url: str) -> Product | None:
     return db.query(Product).filter(Product.url == url).first()
 
+def get_by_id(db: Session, id: int) -> Product | None:
+    return db.query(Product).filter(Product.product_id == id).first()
+
 # def create(db: Session, payload: ProductCreate) -> Product:
 #     product = Product(**payload.model_dump())
 #     db.add(product)

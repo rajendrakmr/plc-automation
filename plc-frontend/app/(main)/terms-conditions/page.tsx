@@ -41,7 +41,7 @@ export default function TermsConditions() {
 
                 </div>
             </section>
-            <FaqSection />
+            {/* <FaqSection /> */}
              
             <ContactUsSection />
         </main>

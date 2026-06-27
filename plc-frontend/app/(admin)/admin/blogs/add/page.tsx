@@ -45,6 +45,7 @@ interface FormErrors {
   blog_slug?: string;
   blog_excerpt?: string;
   blog_content?: string;
+  image?:string;
 }
 
 
@@ -164,23 +165,88 @@ export default function AddBlog() {
     if (featuredImage) {
       const fd = new FormData();
       fd.append("file", featuredImage);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const json = await res.json();
-      imageUrl = json.url || "";
+      fd.append("path", "blogs");
+
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/files/upload`, {
+          method: "POST",
+          body: fd,
+        });
+        const json = await res.json();
+        if (!res.ok) {
+          const fileError =
+            json?.detail?.errors?.file ||
+            json?.errors?.file ||
+            json?.detail?.message ||
+            json?.message ||
+            "Image upload failed";
+
+          setErrors((prev) => ({ ...prev, image: fileError }));
+          return;
+        }
+
+        imageUrl = json.url || "";
+
+      } catch (err) {
+        setErrors((prev) => ({ ...prev, image: "Image upload failed. Please try again." }));
+        return;
+      }
+    } 
+    try {
+      const result = await post({
+        blog_cat_id: Number(form.blog_cat_id),
+        blog_title: form.blog_title,
+        blog_slug: form.blog_slug,
+        blog_excerpt: form.blog_excerpt,
+        blog_content: form.blog_content,
+        blog_img_url: imageUrl,
+        blog_meta_title: form.blog_meta_title,
+        blog_meta_keywords: form.blog_meta_keywords,
+        blog_meta_desc: form.blog_meta_desc,
+        status,
+        tags: selectedTags.map(id => Number(id)),
+        references: form.references
+      });
+      if (!result && imageUrl) {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/files/delete`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: imageUrl }),
+        });
+      }
+
+    } catch (err) {
+      if (imageUrl) {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/files/delete`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: imageUrl }),
+        });
+      }
+      setErrors((prev) => ({ ...prev, general: "Something went wrong. Please try again." }));
     }
-    await post({
-      blog_cat_id: Number(form.blog_cat_id),
-      blog_title: form.blog_title,
-      blog_slug: form.blog_slug,
-      blog_excerpt: form.blog_excerpt,
-      blog_content: form.blog_content,
-      blog_img_url: imageUrl,
-      blog_meta_title: form.blog_meta_title,
-      blog_meta_keywords: form.blog_meta_keywords,
-      blog_meta_desc: form.blog_meta_desc,
-      status,
-      tags: selectedTags.map(id => Number(id))
-    });
+
+
+    // if (featuredImage) {
+    //   const fd = new FormData();
+    //   fd.append("file", featuredImage);
+    //   const res = await fetch("/api/upload", { method: "POST", body: fd });
+    //   const json = await res.json();
+    //   imageUrl = json.url || "";
+    // }
+    // await post({
+    //   blog_cat_id: Number(form.blog_cat_id),
+    //   blog_title: form.blog_title,
+    //   blog_slug: form.blog_slug,
+    //   blog_excerpt: form.blog_excerpt,
+    //   blog_content: form.blog_content,
+    //   blog_img_url: imageUrl,
+    //   blog_meta_title: form.blog_meta_title,
+    //   blog_meta_keywords: form.blog_meta_keywords,
+    //   blog_meta_desc: form.blog_meta_desc,
+    //   status,
+    //   tags: selectedTags.map(id => Number(id))
+    // });
   };
 
   const cls = (base: string, errKey: keyof FormErrors) => `${base}${errors[errKey] ? " ap-has-err" : ""}`;
@@ -227,9 +293,13 @@ export default function AddBlog() {
         </div>
 
         {!success && Object.keys(errors).length > 0 && (
-          <div className="ap-banner error" style={{ color: "#fff" }}>
+          <div className="ap-banner error">
             ⚠ Please fill all mandatory fields.
           </div>
+        )}
+
+        {errors.image && (
+          <div className="ap-banner error">⚠ {errors.image}</div>
         )}
         {error && <div className="ap-banner error">⚠ {error}</div>}
         {success && <div className="ap-banner success">✓ Blog saved successfully!</div>}

@@ -16,23 +16,7 @@ def category_list(
         db: Session = Depends(get_db)):
     return fetch_categories(db, limit,search,category_id,url)
 
- 
-# @router.get("/slugs", response_model=list[CateResp])
-# def category_slugs( 
-#         limit: Optional[int] = None,
-#         search: Optional[str] = None, 
-#         category_id: Optional[int] = None,
-#         slug: Optional[str] = None,
-#         db: Session = Depends(get_db)):
-#     return get_svc_all(
-#         db=db, 
-#         limit=limit,
-#         search=search,
-#         slug=slug,
-#         category_id=category_id)
-
-
-# list as feature categories as per admin  selected
+  
 @router.get("/feature", response_model=list[CatPageResponse])
 def product_list( 
         limit: int = Query(20, ge=1, le=100), 

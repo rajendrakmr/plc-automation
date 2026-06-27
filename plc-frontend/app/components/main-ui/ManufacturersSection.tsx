@@ -41,27 +41,26 @@ export default function ManufacturersSection() {
         <div className="manufacturers-grid">
           {manufacturers?.map((item) => (
             <>
-              <div className="manufacturer-card" key={item.category_id}>
-                <div className="manufacturer-image">
-                  <Image
-                    src={'/assets/items/abb.webp'}
-                    alt={item.cat_name}
-                    fill
-                    className="img"
-                  />
+              <Link
+                href={`/brands/${item.cat_slug}`}
+                key={item.category_id}
+                className="rk_mega_card_cta"
+              >
+
+                <div className="manufacturer-card" key={item.category_id}>
+                  <div className="manufacturer-image">
+                    <Image
+                      src={'/assets/items/abb.webp'}
+                      alt={item.cat_name}
+                      fill
+                      className="img"
+                    />
+                  </div>
+
+                  <h3 className="manufacturer-name">{item.cat_name}</h3>
+
                 </div>
-
-                <h3 className="manufacturer-name">{item.cat_name}</h3>
-                <Link
-                  href={`/brands/${item.cat_slug}`}
-                  key={item.category_id}
-                  className="rk_mega_card_cta"
-                >
-
-                  View all parts
-                </Link>
-
-              </div>
+              </Link>
 
             </>
           ))}

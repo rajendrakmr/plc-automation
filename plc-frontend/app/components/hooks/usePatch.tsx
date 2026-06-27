@@ -97,6 +97,7 @@ export function usePatch<
         }
 
         const resData = responseData as TResponse;
+        console.log("resData", resData);
 
         setData(resData);
         setSuccess(true);

@@ -15,6 +15,7 @@ class Category(Base):
     __tablename__ = "plc_m_categories" 
     category_id = Column(BigInteger,primary_key=True,index=True,autoincrement=True) 
     cat_name = Column(String(255),nullable=False) 
+    cat_short_text = Column(String(255),nullable=True) 
     cat_slug = Column(String(255),nullable=False, unique=True,index=True) 
     cat_desc = Column(Text) 
     meta_title = Column(String(200))

@@ -2,6 +2,7 @@
 
 import { useFetch, PaginatedResponse } from "@/app/components/hooks/useFetch";
 import { truncate } from "@/app/utils/helper";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -106,11 +107,19 @@ export default function ProductsPage() {
     [filters]
   );
 
-  const pageNumbers = useMemo(() => {
-    const start = Math.max(1, page - 2);
-    const end = Math.min(totalPages, start + 4);
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
-  }, [page, totalPages]);
+ const pageNumbers = (() => {
+    const pages: (number | "…")[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (page > 3) pages.push("…");
+      for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) pages.push(i);
+      if (page < totalPages - 2) pages.push("…");
+      pages.push(totalPages);
+    }
+    return pages;
+  })();
 
   const allSelected =
     products.length > 0 && products.every((p) => selected.has(p.blog_slug));
@@ -274,25 +283,17 @@ export default function ProductsPage() {
             <table>
               <thead>
                 <tr>
-                  <th className="col-check no-sort">
+                  {/* <th className="col-check no-sort">
                     <input type="checkbox" checked={allSelected} onChange={(e) => handleSelectAll(e.target.checked)} aria-label="Select all" />
-                  </th>
+                  </th> */}
+                  <th>Feature Image</th>
                   <th className="col-part" onClick={() => handleSort("blog_title")}>
                     Title <SortIcon active={sortKey === "blog_title"} dir={sortDir} />
-                  </th>
-                  {/* <th className="col-type" onClick={() => handleSort("blog_excerpt")}>
-                    Content <SortIcon active={sortKey === "blog_excerpt"} dir={sortDir} />
-                  </th> */}
+                  </th> 
                   <th className="col-cat" onClick={() => handleSort("category")}>
                     Category <SortIcon active={sortKey === "category"} dir={sortDir} />
-                  </th>
-                  {/* <th onClick={() => handleSort("short_desc")}>
-                    Description <SortIcon active={sortKey === "short_desc"} dir={sortDir} />
-                  </th>
-                  <th className="col-stock" onClick={() => handleSort("stock")}>
-                    Stock <SortIcon active={sortKey === "stock"} dir={sortDir} />
-                  </th> */}
-                  <th className="col-actions no-sort" />
+                  </th> 
+                  <th className="col-actions no-sort">Action </th>
                 </tr>
               </thead>
               <tbody>
@@ -308,22 +309,31 @@ export default function ProductsPage() {
                 ) : (
                   products.map((item) => (
                     <tr key={item.blog_id} className={selected.has(item.blog_slug) ? "row-selected" : ""}>
-                      <td className="col-check">
+                      {/* <td className="col-check">
                         <input
                           type="checkbox"
                           checked={selected.has(item.blog_slug)}
                           onChange={(e) => handleSelectRow(item.blog_slug, e.target.checked)}
                           aria-label={`Select ${item.blog_id}`}
                         />
-                      </td>
-                      <td className="col-part"><span className="part-no">{item.blog_title}</span></td>
-                      {/* <td className="col-type">{truncate(item.blog_excerpt,5)}</td> */}
-                      <td className="col-cat"><span className="type-pill">{item.category.blog_cat_name}</span></td>
-                      {/* <td title={item.short_desc}>{item.short_desc}</td>
-                      <td className="col-stock"><StockBadge stock={item.stock} /></td> */}
+                      </td> */}
+                       <td>
+                            {
+                              item.blog_img_url &&
+                              <Image
+                                width={100}
+                                height={60}
+                                src={`${process.env.NEXT_PUBLIC_APP_URL}${item.blog_img_url}`}
+                                alt={item.blog_title}
+                                unoptimized
+                              />
+                            }
+                          </td>
+                      <td className="col-part"><span className="part-no">{truncate(item.blog_title)}</span></td> 
+                      <td className="col-cat"><span className="type-pill">{item.category.blog_cat_name}</span></td> 
                       <td className="col-actions">
                         <button className="action-btn" title="Edit" aria-label={`Edit ${item.blog_id}`} onClick={() => handleRowEditAction(item)}>✏️</button>
-                        <button className="action-btn danger" title="Trash" aria-label={`Trash ${item.blog_id}`} onClick={() => handleRowAction("trash", item.blog_slug)}>🗑️</button>
+                        {/* <button className="action-btn danger" title="Trash" aria-label={`Trash ${item.blog_id}`} onClick={() => handleRowAction("trash", item.blog_slug)}>🗑️</button> */}
                       </td>
                     </tr>
                   ))
@@ -332,7 +342,7 @@ export default function ProductsPage() {
             </table>
           </div>
 
-          {/* ── Footer ── */}
+          
           <div className="table-footer">
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span className="page-info">Rows:</span>
@@ -343,10 +353,10 @@ export default function ProductsPage() {
             <span className="page-info">
               Showing <strong>{total ? (page - 1) * limit + 1 : 0}–{Math.min(page * limit, total)}</strong> of <strong>{total}</strong>
             </span>
-            <div className="pagination">
+           <div className="pagination">
               <button className="pg-btn" disabled={page <= 1} onClick={() => setPage((p) => p - 1)} aria-label="Previous page">‹</button>
               {pageNumbers.map((n) => (
-                <button key={n} className={`pg-btn ${n === page ? "pg-active" : ""}`} onClick={() => setPage(n)} aria-current={n === page ? "page" : undefined}>{n}</button>
+                <button key={n} className={`pg-btn ${n === page ? "pg-active" : ""}`}onClick={() => setPage(n as number)} aria-current={n === page ? "page" : undefined}>{n}</button>
               ))}
               <button className="pg-btn" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} aria-label="Next page">›</button>
             </div>

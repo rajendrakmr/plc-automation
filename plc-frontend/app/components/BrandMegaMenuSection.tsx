@@ -1,6 +1,34 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useFetchData } from "../utils/useFetchData";
+interface Categories {
+  category_id: number;
+  cat_name: string;
+  cat_slug: string;
+  image_url: string;
+}
+
+export interface BlogCategory {
+  blog_cat_id: number;
+  blog_cat_name: string;
+}
+
+export interface Blog {
+  blog_id: number;
+  blog_title: string;
+  blog_meta_title: string;
+  blog_slug: string;
+  blog_meta_desc: string;
+  blog_excerpt: string;
+  blog_meta_keywords: string;
+  blog_content: string;
+  blog_published_at: string | null;
+  blog_img_url: string;
+  blog_author: string;
+  category: BlogCategory;
+}
+ 
 export default function BrandMegaMenuSection({ popularBrands }: {
     popularBrands: {
         category_id: number;
@@ -8,6 +36,15 @@ export default function BrandMegaMenuSection({ popularBrands }: {
         cat_slug: string;
     }[]
 }) {
+
+     const { data: categories, loading: catLoading } = useFetchData<Categories[]>({
+       url: '/categories/feature?type=header',
+       params: {
+         limit: 8,
+         type: "header"
+       },
+     });
+
     return (
         <div className="rk_mega_dropdown">
             <div className="rk_mega_wrap">
@@ -55,7 +92,7 @@ export default function BrandMegaMenuSection({ popularBrands }: {
                         </p>
 
                         <div className="rk_mega_cards_grid">
-                            {popularBrands.slice(0, 8).map((brand) => (
+                            {categories?.slice(0, 8).map((brand) => (
                                 <Link
                                     onClick={(e) => {
                                         e.preventDefault();

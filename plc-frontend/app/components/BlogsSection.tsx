@@ -244,7 +244,7 @@ const BlogsSection: React.FC = () => {
         }
         .blog-card {
           background: #fff;
-          border: 1px solid #e8e8e8;
+          border: 1px solid #d4d4d4;
           border-radius: 12px;
           overflow: hidden;
           transition: border-color 0.15s, box-shadow 0.15s;

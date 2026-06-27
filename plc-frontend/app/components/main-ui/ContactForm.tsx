@@ -10,6 +10,7 @@ interface FormData {
   phone: string;
   email: string;
   message: string;
+  company?: string; 
 }
 
 export default function ContactForm() {
@@ -71,7 +72,7 @@ export default function ContactForm() {
     <div className="quoteform">
       <div className="quote-header">
         <p>
-          <span>Get a quick quote for </span> 
+          <span>Write to us</span> 
         </p>
       </div>
       <div className="rfq-card">
@@ -82,6 +83,16 @@ export default function ContactForm() {
               name="name"
               placeholder="Full Name *"
               value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+            <div className="form-group">
+            <input
+              type="text"
+              name="company"
+              placeholder="Company Name *"
+              value={formData.company}
               onChange={handleChange}
               required
             />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-
+import { useGet } from "@/app/components/hooks/useGet";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface StatCard {
@@ -38,54 +38,29 @@ interface ChartPoint {
 
 // ─── Demo Data ────────────────────────────────────────────────────────────────
 
-const STATS: StatCard[] = [
-  { label: "Total Enquiries", value: 248, sub: "This month", trend: "up",   trendVal: "+18%", icon: "✉", accent: "#3b82f6" },
-  { label: "New Enquiries",   value: 34,  sub: "Unread",     trend: "up",   trendVal: "+5",   icon: "🔔", accent: "#f59e0b" },
-  { label: "Total Products",  value: 912, sub: "In catalogue",trend: "flat", trendVal: "—",   icon: "📦", accent: "#0d9488" },
-  { label: "Low Stock Items", value: 17,  sub: "Need reorder",trend: "down", trendVal: "-3",  icon: "⚠️", accent: "#ef4444" },
-  { label: "Orders Today",    value: 43,  sub: "vs 38 yesterday",trend: "up", trendVal: "+13%",icon: "🛒", accent: "#8b5cf6" },
-  { label: "Revenue (Mon)",   value: "₹2.4L", sub: "June 2026", trend: "up", trendVal: "+22%", icon: "💰", accent: "#10b981" },
-];
 
-const CHART_DATA: ChartPoint[] = [
-  { label: "Jan", enquiries: 58,  orders: 34 },
-  { label: "Feb", enquiries: 72,  orders: 41 },
-  { label: "Mar", enquiries: 65,  orders: 38 },
-  { label: "Apr", enquiries: 90,  orders: 55 },
-  { label: "May", enquiries: 110, orders: 67 },
-  { label: "Jun", enquiries: 248, orders: 43 },
-];
+
+ 
 
 const RECENT_ENQUIRIES: RecentEnquiry[] = [
-  { id: "ENQ-001", name: "Rahul Agarwal",  subject: "Product availability – SN-2045",        status: "new",     time: "38 min ago" },
-  { id: "ENQ-002", name: "Priya Mehta",    subject: "Bulk order pricing – AC-1100",           status: "replied", time: "3 hrs ago"  },
-  { id: "ENQ-003", name: "Suresh Kumar",   subject: "Datasheet – Hydraulic Valve HV-300",     status: "pending", time: "Yesterday"  },
-  { id: "ENQ-004", name: "Anita Nair",     subject: "Damaged item – Order #ORD-44521",        status: "new",     time: "Yesterday"  },
-  { id: "ENQ-005", name: "Meena Krishnan", subject: "Export inquiry – GCC region",            status: "new",     time: "2 days ago" },
+  { id: "ENQ-001", name: "Rahul Agarwal", subject: "Product availability – SN-2045", status: "new", time: "38 min ago" },
+  { id: "ENQ-002", name: "Priya Mehta", subject: "Bulk order pricing – AC-1100", status: "replied", time: "3 hrs ago" },
+  { id: "ENQ-003", name: "Suresh Kumar", subject: "Datasheet – Hydraulic Valve HV-300", status: "pending", time: "Yesterday" },
+  { id: "ENQ-004", name: "Anita Nair", subject: "Damaged item – Order #ORD-44521", status: "new", time: "Yesterday" },
+  { id: "ENQ-005", name: "Meena Krishnan", subject: "Export inquiry – GCC region", status: "new", time: "2 days ago" },
 ];
 
-const RECENT_ORDERS: RecentOrder[] = [
-  { id: "ORD-4891", part: "SN-2045 Sensor",       qty: 50,  amount: "₹42,500",  status: "processing" },
-  { id: "ORD-4890", part: "AC-1100 Actuator",      qty: 200, amount: "₹1,84,000",status: "shipped"    },
-  { id: "ORD-4889", part: "HV-300 Hydraulic Valve",qty: 10,  amount: "₹18,750",  status: "delivered"  },
-  { id: "ORD-4888", part: "PN-55 Fitting",         qty: 100, amount: "₹9,200",   status: "delivered"  },
-  { id: "ORD-4887", part: "AC-220 Actuator",       qty: 5,   amount: "₹12,500",  status: "cancelled"  },
-];
+ 
 
-const STOCK_DATA = [
-  { name: "In Stock",     value: 724, color: "#0d9488" },
-  { name: "Limited",      value: 171, color: "#f59e0b" },
-  { name: "Out of Stock", value: 17,  color: "#ef4444" },
-];
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function EnqStatusBadge({ status }: { status: RecentEnquiry["status"] }) {
   const map = {
-    new:     { label: "New",     bg: "#fee2e2", color: "#7f1d1d" },
+    new: { label: "New", bg: "#fee2e2", color: "#7f1d1d" },
     replied: { label: "Replied", bg: "#dcfce7", color: "#14532d" },
     pending: { label: "Pending", bg: "#fef9c3", color: "#713f12" },
-    closed:  { label: "Closed",  bg: "#f1f5f9", color: "#64748b" },
+    closed: { label: "Closed", bg: "#f1f5f9", color: "#64748b" },
   };
   const s = map[status];
   return (
@@ -95,20 +70,7 @@ function EnqStatusBadge({ status }: { status: RecentEnquiry["status"] }) {
   );
 }
 
-function OrdStatusBadge({ status }: { status: RecentOrder["status"] }) {
-  const map = {
-    processing: { label: "Processing", bg: "#dbeafe", color: "#1e40af" },
-    shipped:    { label: "Shipped",    bg: "#ede9fe", color: "#5b21b6" },
-    delivered:  { label: "Delivered",  bg: "#dcfce7", color: "#14532d" },
-    cancelled:  { label: "Cancelled",  bg: "#fee2e2", color: "#7f1d1d" },
-  };
-  const s = map[status];
-  return (
-    <span style={{ background: s.bg, color: s.color, fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 20 }}>
-      {s.label}
-    </span>
-  );
-}
+
 
 function AvatarCircle({ name }: { name: string }) {
   const initials = name.split(" ").slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("");
@@ -125,40 +87,7 @@ function AvatarCircle({ name }: { name: string }) {
   );
 }
 
-// ─── Bar Chart (SVG) ─────────────────────────────────────────────────────────
 
-function BarChart({ data }: { data: ChartPoint[] }) {
-  const maxVal = Math.max(...data.flatMap((d) => [d.enquiries, d.orders]));
-  const H = 140;
-  const barW = 18;
-  const gap = 6;
-  const groupW = barW * 2 + gap;
-  const colW = groupW + 28;
-  const W = data.length * colW + 20;
-
-  return (
-    <svg viewBox={`0 0 ${W} ${H + 30}`} style={{ width: "100%", height: H + 30, overflow: "visible" }}>
-      {[0, 0.25, 0.5, 0.75, 1].map((t) => (
-        <g key={t}>
-          <line x1={0} x2={W} y1={H - t * H} y2={H - t * H} stroke="#f1f5f9" strokeWidth={1} />
-          <text x={0} y={H - t * H - 3} fontSize={9} fill="#94a3b8">{Math.round(maxVal * t)}</text>
-        </g>
-      ))}
-      {data.map((d, i) => {
-        const x = 24 + i * colW;
-        const enqH = (d.enquiries / maxVal) * H;
-        const ordH = (d.orders / maxVal) * H;
-        return (
-          <g key={d.label}>
-            <rect x={x} y={H - enqH} width={barW} height={enqH} fill="#3b82f6" rx={3} opacity={0.85} />
-            <rect x={x + barW + gap} y={H - ordH} width={barW} height={ordH} fill="#0d9488" rx={3} opacity={0.85} />
-            <text x={x + groupW / 2} y={H + 14} fontSize={10} fill="#64748b" textAnchor="middle">{d.label}</text>
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
 
 // ─── Donut Chart (SVG) ───────────────────────────────────────────────────────
 
@@ -212,6 +141,26 @@ export default function DashboardPage() {
     setNow(fmt);
     setTimeout(() => setAnimIn(true), 50);
   }, []);
+
+
+  const { data: recordsData, loading: catLoading } = useGet<any>({
+    url: "/dashboard/stats",
+  });
+
+  const STATS: StatCard[] = [
+    { label: "Total Blogs", value: recordsData?.blogs?.total, sub: "In Contents", trend: "up", trendVal: "—", icon: "✉", accent: "#3b82f6" },
+    { label: "Total Products", value: recordsData?.products?.total, sub: "In catalogue", trend: "flat", trendVal: "—", icon: "📦", accent: "#0d9488" },
+    { label: "New Enquiries", value: recordsData?.enquiries?.total, sub: "Unread", trend: "up", trendVal: "—", icon: "🔔", accent: "#f59e0b" },
+    // { label: "Low Stock Items", value: 17, sub: "Need reorder", trend: "down", trendVal: "-3", icon: "⚠️", accent: "#ef4444" },
+    // { label: "Orders Today", value: 43, sub: "vs 38 yesterday", trend: "up", trendVal: "+13%", icon: "🛒", accent: "#8b5cf6" },
+    // { label: "Revenue (Mon)", value: "₹2.4L", sub: "June 2026", trend: "up", trendVal: "+22%", icon: "💰", accent: "#10b981" },
+  ];
+
+  const STOCK_DATA = [
+  { name: "In Stock", value: recordsData?.products?.in_stock, color: "#0d9488" },
+  { name: "Limited", value: recordsData?.products?.limited, color: "#f59e0b" },
+  { name: "Out of Stock", value: recordsData?.products?.out_stock, color: "#ef4444" },
+];
 
   return (
     <>
@@ -303,7 +252,7 @@ export default function DashboardPage() {
         .qa-label { font-size: 12px; font-weight: 500; color: #1e293b; }
       `}</style>
 
-      <div className="db-page"> 
+      <div className="db-page">
         <div className={`db-header fade-row ${animIn ? "in" : ""}`}>
           <div>
             <p className="db-greeting">{greeting}, PLC Automation Admin 👋</p>
@@ -311,8 +260,8 @@ export default function DashboardPage() {
           </div>
           <div className="db-now">{now}</div>
         </div>
- 
-        {/* <div className={`stats-grid fade-row ${animIn ? "in" : ""}`}>
+
+        <div className={`stats-grid fade-row ${animIn ? "in" : ""}`}>
           {STATS.map((s) => (
             <div className="stat-card" key={s.label}>
               <div className="stat-accent" style={{ background: s.accent }} />
@@ -327,64 +276,13 @@ export default function DashboardPage() {
               <div className="stat-sub">{s.sub}</div>
             </div>
           ))}
-        </div> */}
- 
-        {/* <div className={`chart-card fade-row ${animIn ? "in" : ""}`}>
-          <div className="card-head">
-            <span className="card-title">Enquiries vs Orders — 2026</span>
-            <div className="chart-legend">
-              <span className="legend-item"><span className="legend-dot" style={{ background: "#3b82f6" }} />Enquiries</span>
-              <span className="legend-item"><span className="legend-dot" style={{ background: "#0d9488" }} />Orders</span>
-            </div>
-          </div>
-          <div className="card-body">
-            <BarChart data={CHART_DATA} />
-          </div>
-        </div> */}
+        </div>
 
-       
-        {/* <div className={`main-grid fade-row ${animIn ? "in" : ""}`}> 
-          <div className="db-card">
-            <div className="card-head">
-              <span className="card-title">Recent Enquiries</span>
-              <a className="card-link" href="/admin/enquiries">View all →</a>
-            </div>
-            <div className="card-body">
-              {RECENT_ENQUIRIES.map((e) => (
-                <div className="enq-row" key={e.id}>
-                  <AvatarCircle name={e.name} />
-                  <div className="enq-info">
-                    <div className="enq-name">{e.name}</div>
-                    <div className="enq-subj">{e.subject}</div>
-                  </div>
-                  <EnqStatusBadge status={e.status} />
-                  <span className="enq-time">{e.time}</span>
-                </div>
-              ))}
-            </div>
-          </div> 
-          <div className="db-card">
-            <div className="card-head">
-              <span className="card-title">Recent Orders</span>
-              <a className="card-link" href="/admin/orders">View all →</a>
-            </div>
-            <div className="card-body">
-              {RECENT_ORDERS.map((o) => (
-                <div className="ord-row" key={o.id}>
-                  <span className="ord-id">{o.id}</span>
-                  <div className="ord-info">
-                    <div className="ord-part">{o.part}</div>
-                    <div className="ord-qty">Qty: {o.qty}</div>
-                  </div>
-                  <span className="ord-amt">{o.amount}</span>
-                  <OrdStatusBadge status={o.status} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div> */}
- 
-        {/* <div className={`main-grid fade-row ${animIn ? "in" : ""}`}> 
+
+
+
+
+        <div className={`main-grid fade-row ${animIn ? "in" : ""}`}>
           <div className="db-card">
             <div className="card-head">
               <span className="card-title">Stock Overview</span>
@@ -394,30 +292,8 @@ export default function DashboardPage() {
               <DonutChart data={STOCK_DATA} />
             </div>
           </div>
- 
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}> 
-            <div className="db-card">
-              <div className="card-head">
-                <span className="card-title">Recent Activity</span>
-              </div>
-              <div className="card-body">
-                {[
-                  { dot: "#3b82f6", text: "New enquiry from Rahul Agarwal about SN-2045 stock.", time: "38 min ago" },
-                  { dot: "#0d9488", text: "Order #ORD-4890 shipped to Priya Mehta (200 units AC-1100).", time: "2 hrs ago" },
-                  { dot: "#f59e0b", text: "Low stock alert — HV-300 Hydraulic Valve below 10 units.", time: "4 hrs ago" },
-                  { dot: "#16a34a", text: "Order #ORD-4889 delivered successfully.", time: "Yesterday" },
-                  { dot: "#ef4444", text: "Order #ORD-4887 cancelled by customer.", time: "Yesterday" },
-                ].map((a, i) => (
-                  <div className="activity-item" key={i}>
-                    <div className="act-dot" style={{ background: a.dot }} />
-                    <div>
-                      <div className="act-text">{a.text}</div>
-                      <div className="act-time">{a.time}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div> 
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div className="db-card">
               <div className="card-head">
                 <span className="card-title">Quick Actions</span>
@@ -425,10 +301,10 @@ export default function DashboardPage() {
               <div className="card-body">
                 <div className="qa-grid">
                   {[
-                    { icon: "📦", label: "Add Product",     href: "/admin/products/add" },
-                    { icon: "✉",  label: "View Enquiries",  href: "/admin/enquiries"    },
-                    { icon: "📊", label: "Export Report",   href: "#"                   },
-                    { icon: "⚙️", label: "Settings",        href: "/admin/settings"     },
+                    { icon: "📦", label: "Add Product", href: "/admin/products/add" },
+                    { icon: "✉", label: "View Enquiries", href: "/admin/enquiries" },
+                    { icon: "📊", label: "Export Report", href: "#" },
+                    { icon: "⚙️", label: "Settings", href: "/admin/settings" },
                   ].map((q) => (
                     <a key={q.label} href={q.href} className="qa-btn" style={{ textDecoration: "none" }}>
                       <span className="qa-icon">{q.icon}</span>
@@ -438,8 +314,28 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
+            <div className="db-card">
+              <div className="card-head">
+                <span className="card-title">Recent Enquiries</span>
+                <a className="card-link" href="/admin/enquiries">View all →</a>
+              </div>
+              <div className="card-body">
+                {RECENT_ENQUIRIES.map((e) => (
+                  <div className="enq-row" key={e.id}>
+                    <AvatarCircle name={e.name} />
+                    <div className="enq-info">
+                      <div className="enq-name">{e.name}</div>
+                      <div className="enq-subj">{e.subject}</div>
+                    </div>
+                    <EnqStatusBadge status={e.status} />
+                    <span className="enq-time">{e.time}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
-        </div> */}
+        </div>
       </div>
     </>
   );

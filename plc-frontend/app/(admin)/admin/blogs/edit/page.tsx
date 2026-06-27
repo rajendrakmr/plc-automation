@@ -136,7 +136,7 @@ export default function EditBlog() {
   const { loading, error, success, patch, reset } = usePatch<any, { id: string }>({
     url: `/blogs/${form.blog_id}`,
     onSuccess: () => {
-      setForm(EMPTY_FORM);
+      // setForm(EMPTY_FORM);
       setErrors({});
       setSelectedTags([]);
       setFeaturedImage(null);
@@ -170,27 +170,100 @@ export default function EditBlog() {
     }
 
     let imageUrl = form.blog_img_url || "";
+
     if (featuredImage) {
       const fd = new FormData();
       fd.append("file", featuredImage);
-      const res = await fetch(`/api/upload/`, { method: "POST", body: fd });
-      const json = await res.json();
-      imageUrl = json.url || "";
+      fd.append("path", "blogs");
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/files/upload`, {
+          method: "POST",
+          body: fd,
+        });
+        const json = await res.json();
+        if (!res.ok) {
+          const fileError =
+            json?.detail?.errors?.file ||
+            json?.errors?.file ||
+            json?.detail?.message ||
+            json?.message ||
+            "Image upload failed";
+
+          setErrors((prev) => ({ ...prev, image: fileError }));
+          return;
+        }
+        if (form.blog_img_url) {
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/files/delete`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: form.blog_img_url }),
+          });
+        }
+
+        imageUrl = json.url || "";
+
+      } catch (err) {
+        setErrors((prev) => ({ ...prev, image: "Image upload failed. Please try again." }));
+        return;
+      }
     }
-    await patch({
-      blog_cat_id: Number(form.blog_cat_id),
-      blog_id: Number(form.blog_id),
-      blog_title: form.blog_title,
-      blog_slug: form.blog_slug,
-      blog_excerpt: form.blog_excerpt,
-      blog_content: form.blog_content,
-      blog_img_url: imageUrl,
-      blog_meta_title: form.blog_meta_title,
-      blog_meta_keywords: form.blog_meta_keywords,
-      blog_meta_desc: form.blog_meta_desc,
-      status,
-      tags: selectedTags.map(id => Number(id))
-    });
+    try {
+      const result = await patch({
+        blog_cat_id: Number(form.blog_cat_id),
+        blog_id: Number(form.blog_id),
+        blog_title: form.blog_title,
+        blog_slug: form.blog_slug,
+        blog_excerpt: form.blog_excerpt,
+        blog_content: form.blog_content,
+        blog_img_url: imageUrl,
+        blog_meta_title: form.blog_meta_title,
+        blog_meta_keywords: form.blog_meta_keywords,
+        blog_meta_desc: form.blog_meta_desc,
+        status,
+        tags: selectedTags.map(id => Number(id)),
+        references: form.references
+      });
+      if (!result && imageUrl) {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/files/delete`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: imageUrl }),
+        });
+      }
+
+    } catch (err) {
+      if (imageUrl) {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/files/delete`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: imageUrl }),
+        });
+      }
+      setErrors((prev) => ({ ...prev, general: "Something went wrong. Please try again." }));
+    }
+
+
+    // if (featuredImage) {
+    //   const fd = new FormData();
+    //   fd.append("file", featuredImage);
+    //   const res = await fetch(`/api/upload/`, { method: "POST", body: fd });
+    //   const json = await res.json();
+    //   imageUrl = json.url || "";
+    // }
+    // await patch({
+    //   blog_cat_id: Number(form.blog_cat_id),
+    //   blog_id: Number(form.blog_id),
+    //   blog_title: form.blog_title,
+    //   blog_slug: form.blog_slug,
+    //   blog_excerpt: form.blog_excerpt,
+    //   blog_content: form.blog_content,
+    //   blog_img_url: imageUrl,
+    //   blog_meta_title: form.blog_meta_title,
+    //   blog_meta_keywords: form.blog_meta_keywords,
+    //   blog_meta_desc: form.blog_meta_desc,
+    //   status,
+    //   tags: selectedTags.map(id => Number(id))
+    // });
   };
 
   const cls = (base: string, errKey: keyof FormErrors) => `${base}${errors[errKey] ? " ap-has-err" : ""}`;
@@ -371,6 +444,7 @@ export default function EditBlog() {
             <Card title="Featured Image">
               <FeaturedImageUploader
                 value={featuredImage}
+                image_url={form.blog_img_url}
                 onChange={setFeaturedImage}
               />
             </Card>

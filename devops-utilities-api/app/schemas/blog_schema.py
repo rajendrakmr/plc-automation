@@ -41,6 +41,12 @@ class BlogRefCreate(BaseModel):
     ref_title: str = Field(..., max_length=255)
     ref_url: str = Field(..., max_length=255)
 
+class BlogRefUpdate(BaseModel):
+    """Used when creating/updating — no IDs exist yet.""" 
+    blog_ref_id: Optional[int] = None
+    ref_title: str = Field(..., max_length=255)
+    ref_url: str = Field(..., max_length=255)
+
 
 class BlogRefResponse(BaseModel):
     """Used when returning data that already exists in the DB."""
@@ -109,7 +115,7 @@ class BlogUpdate(BaseModel):
     blog_published_at: Optional[datetime] = None
     status: Optional[BlogStatus] = None
     tags: list[int] = []
-    references: list[BlogRefCreate] = []
+    references: list[BlogRefUpdate] = []
 
     @field_validator("blog_slug")
     @classmethod
@@ -168,3 +174,109 @@ class BlogListResponse(BaseModel):
     page: int
     limit: int
     total_pages: int
+    
+    
+    
+    
+class BlogCategoryCreate(BaseModel):
+    # blog_cat_id: int
+    blog_cat_name: str = Field(..., min_length=3, max_length=255)
+    blog_cat_slug: str = Field(..., min_length=3, max_length=255) 
+
+    @field_validator("blog_cat_slug")
+    @classmethod
+    def validate_slug(cls, v: str):
+        v = v.strip().lower()
+        if not re.match(r"^[a-z0-9-]+$", v):
+            raise ValueError("Slug can only contain lowercase letters, numbers and hyphens")
+        return v
+
+    @field_validator("blog_cat_name")
+    @classmethod
+    def validate_title(cls, v: str):
+        v = v.strip()
+        if len(v) < 3:
+            raise ValueError("Title must be at least 3 characters")
+        return v
+    
+    
+
+class BlogCategoryUpdate(BaseModel):
+    blog_cat_id: int
+    status: int
+    blog_cat_name: str = Field(..., min_length=3, max_length=255)
+    blog_cat_slug: str = Field(..., min_length=3, max_length=255) 
+
+    @field_validator("blog_cat_slug")
+    @classmethod
+    def validate_slug(cls, v: str):
+        v = v.strip().lower()
+        if not re.match(r"^[a-z0-9-]+$", v):
+            raise ValueError("Slug can only contain lowercase letters, numbers and hyphens")
+        return v
+
+    @field_validator("blog_cat_name")
+    @classmethod
+    def validate_title(cls, v: str):
+        v = v.strip()
+        if len(v) < 3:
+            raise ValueError("Title must be at least 3 characters")
+        return v
+
+
+ 
+    
+class BlogTagCreate(BaseModel):
+    # blog_cat_id: int
+    blog_tag_name: str = Field(..., min_length=3, max_length=255)
+    blog_tag_slug: str = Field(..., min_length=3, max_length=255) 
+
+    @field_validator("blog_tag_slug")
+    @classmethod
+    def validate_slug(cls, v: str):
+        v = v.strip().lower()
+        if not re.match(r"^[a-z0-9-]+$", v):
+            raise ValueError("Slug can only contain lowercase letters, numbers and hyphens")
+        return v
+
+    @field_validator("blog_tag_name")
+    @classmethod
+    def validate_title(cls, v: str):
+        v = v.strip()
+        if len(v) < 3:
+            raise ValueError("Title must be at least 3 characters")
+        return v
+    
+    
+
+class BlogTagUpdate(BaseModel):
+    blog_tag_id: int
+    status: int
+    blog_tag_name: str = Field(..., min_length=3, max_length=255)
+    blog_tag_slug: str = Field(..., min_length=3, max_length=255) 
+
+    @field_validator("blog_tag_slug")
+    @classmethod
+    def validate_slug(cls, v: str):
+        v = v.strip().lower()
+        if not re.match(r"^[a-z0-9-]+$", v):
+            raise ValueError("Slug can only contain lowercase letters, numbers and hyphens")
+        return v
+
+    @field_validator("blog_tag_name")
+    @classmethod
+    def validate_title(cls, v: str):
+        v = v.strip()
+        if len(v) < 3:
+            raise ValueError("Title must be at least 3 characters")
+        return v
+
+
+class BlogTagResponse(BaseModel):
+    blog_tag_id: int
+    blog_tag_name: str
+    blog_tag_slug: str
+    status: int
+
+    class Config:
+        from_attributes = True

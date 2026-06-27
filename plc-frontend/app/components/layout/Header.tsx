@@ -52,7 +52,7 @@ export default function Header() {
     url: '/blogs/feature',
     params: {
       limit: 6,
-      type: "m"
+      type: "header"
     },
   });
 
@@ -65,10 +65,10 @@ export default function Header() {
     document.body.style.overflow = "";
   };
   const { data: categories, loading: catLoading } = useFetchData<Categories[]>({
-    url: '/categories/feature?type=mega',
+    url: '/categories/feature?type=popular',
     params: {
       limit: 10,
-      type: "mega"
+      type: "popular"
     },
   });
   const toggleMobileNav = () => {

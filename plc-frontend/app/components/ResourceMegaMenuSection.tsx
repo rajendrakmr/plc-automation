@@ -24,7 +24,7 @@ export default function ResourceMegaMenuSection({ resources }: { resources?: { n
         url: '/blogs/feature',
         params: {
             limit: 6,
-            type: "mega"
+            type: "header"
         }, 
     });
 
@@ -41,6 +41,10 @@ export default function ResourceMegaMenuSection({ resources }: { resources?: { n
                                 <li key={row.url}>
                                     <Link
                                         href={row.url}
+                                        onClick={(e) => {
+                                        e.preventDefault();
+                                        window.location.href =row.url
+                                    }}
                                         className="rk_mega_brand_link"
                                     >
                                         {row.name}

@@ -5,7 +5,7 @@ from fastapi import HTTPException, status
 from app.repositories import product_repo
 from app.schemas.products import ProductCreate,ProductUpdate
 from app.models.products import Product
-
+import math
 # Create new product
 def create_product(db: Session, payload: ProductCreate) -> Product: 
     existing = product_repo.get_by_part(db, payload.part_no)
@@ -75,7 +75,7 @@ def fetch_products(
             "page": page,
             "limit": limit,
             "total": total,
-            "pages": (total + limit - 1) // limit
+            "pages": math.ceil(total/limit) // limit
         }
     }
     

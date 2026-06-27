@@ -28,19 +28,29 @@ export default function Footer() {
           <div className="eu-footer-col">
             <p>Manufacturers</p>
 
-            <Link href="/">ABB</Link>
-            <Link href="/">Fanuc</Link>
-            <Link href="/">Indramat</Link>
-            <Link href="/">Mitsubishi</Link>
-            <Link href="/">Schneider</Link>
-            <Link href="/">All Manufacturers</Link>
-            <Link href="/">Categories</Link>
-            <Link href="/">Parts In Stock</Link>
+            <Link href="/brands/abb">ABB</Link>
+            <Link href="/brands/fanuc">Fanuc</Link>
+            <Link href="/brands/indramat">Indramat</Link>
+            <Link href="/brands/mitsubishi">Mitsubishi</Link>
+            <Link href="/brands/schneider">Schneider</Link>
+            <Link href="/brands">All Manufacturers</Link> 
           </div>
 
           {/* COLUMN 3 */}
           <div className="eu-footer-col">
-            <p>Explore More</p>
+            <div className="subscribe-box">
+              <p className="text-coral-500">Let's stay in touch</p>
+
+              <p>
+                Get regular updates and real automation insights straight to your
+                inbox.
+              </p>
+
+              <button className="subscribe-btn">
+                Subscribe
+              </button>
+            </div>
+            {/* <p>Explore More</p>
 
             <Link href="/">Knowledge Hub</Link>
             <Link href="/">Watch</Link>
@@ -48,7 +58,7 @@ export default function Footer() {
             <Link href="/">Listen</Link>
             <Link href="/">Manufacturing Made Possible</Link>
             <Link href="/">Topics</Link>
-            <Link href="/">Industries</Link>
+            <Link href="/">Industries</Link> */}
           </div>
 
           {/* COLUMN 4 */}
@@ -92,20 +102,42 @@ export default function Footer() {
 
             </div>
             {/* SUBSCRIBE */}
-            <div className="subscribe-box">
-              <p className="text-coral-500">Let's stay in touch</p>
+            <div className="eu-footer-social" style={{ justifyContent: "start" }}>
+              <div className="rk_social_icons footer-social">
+                <Link href="https://www.reddit.com/user/plc_automation_2021/">
+                  <i className="fab fa-reddit"></i>
+                </Link>
+                <Link href="https://www.linkedin.com/company/78855232">
+                  <i className="fab fa-linkedin-in"></i>
+                </Link>
+                <Link href="https://www.instagram.com/plc_automation_2021/">
+                  <i className="fab fa-instagram"></i>
+                </Link>
 
-              <p>
-                Get regular updates and real automation insights straight to your
-                inbox.
-              </p>
+                <Link href="https://www.facebook.com/plcautomat">
+                  <i className="fab fa-facebook-f"></i>
+                </Link>
 
-              <button className="subscribe-btn">
-                Subscribe
-              </button>
+                <Link href="https://youtube.com/@plcautomationgroup">
+                  <i className="fab fa-youtube"></i>
+                </Link>
+              </div>
             </div>
+
           </div>
         </div>
+        <div className="eu-client-middle eu-footer-middle-2" style={{ width: "100%" }}>
+          <div className="eu-client-logo">
+            <Image
+              src="/assets/PLCAutomation-Certification.webp"
+              alt="Logo"
+              width={700}
+              height={80}
+              style={{ width: "100%", height: "auto" }}
+            />
+          </div>
+        </div>
+
 
         {/* MIDDLE */}
         <div className="eu-footer-middle">
@@ -121,39 +153,21 @@ export default function Footer() {
             <span>© copyright 2026</span>
           </div>
 
-          <div className="eu-footer-address">
+          {/* <div className="eu-footer-address">
             PLC Automation Australia Pty Ltd Suite 302, 13/15 Wentworth Ave Australia (2000)
-          </div>
+          </div> */}
 
-          <div className="eu-footer-social" style={{ justifyContent: "center" }}>
-            <div className="rk_social_icons footer-social">
-              <Link href="https://www.reddit.com/user/plc_automation_2021/">
-                <i className="fab fa-reddit"></i>
-              </Link>
-              <Link href="https://www.linkedin.com/company/78855232">
-                <i className="fab fa-linkedin-in"></i>
-              </Link>
-              <Link href="https://www.instagram.com/plc_automation_2021/">
-                <i className="fab fa-instagram"></i>
-              </Link>
 
-              <Link href="https://www.facebook.com/plcautomat">
-                <i className="fab fa-facebook-f"></i>
-              </Link>
-
-              <Link href="https://youtube.com/@plcautomationgroup">
-                <i className="fab fa-youtube"></i>
-              </Link>
-            </div>
-          </div>
         </div>
+
+
 
         {/* BOTTOM */}
         <div className="eu-footer-bottom">
-          PLC Automation Group is not an authorised distributor or representative of the manufacturers featured on this website. Brand names and trademarks featured are the property of their respective owners.
-          <Link href="/login" style={{color:"var(--blue)"}}>Admin Login</Link>
+          PLC Automation Group is not an authorised distributor or representative of the manufacturers featured on this website. We supply genuine products sourced through lawful channels and provide independent engineering, technical support, and industrial solutions to customers across various industries.
+          <Link href="/login" style={{ color: "var(--blue)" }}>Admin Login</Link>
         </div>
       </div>
-    </footer>
+    </footer >
   );
 }

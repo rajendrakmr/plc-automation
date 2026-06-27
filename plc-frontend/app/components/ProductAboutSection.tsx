@@ -3,6 +3,7 @@ import Image from "next/image";
 interface Product {
     title?: string;
     description?: string;
+    cat_short_text?: string;
 }
 const ProductAboutSection = ({ products }: { products: Product }) => {
 
@@ -32,14 +33,20 @@ const ProductAboutSection = ({ products }: { products: Product }) => {
             <div className="section_container abb-container">
                 <div className="abb-content">
                     <h2>{products?.title}</h2>
-                    <p>
+                    {
+                        products?.cat_short_text && <div
+                            className="product_desc"
+                            dangerouslySetInnerHTML={{ __html: products.cat_short_text }}
+                        />
+                    }
+                    {/* <p>
                         Browse our wide-ranging list of new, obsolete and refurbished ABB
                         parts, including variable speed drives, DC drives, PLCs and general
                         automation spares.
                     </p>
                     <p>
                         All components are sold as standard with a full 12-month warranty.
-                    </p>
+                    </p> */}
                 </div>
                 <div className="abb-stats">
                     {stats.map((stat) => (

@@ -25,7 +25,7 @@ export default function FAQ() {
 
             <FaqSection />
 
-            <ContactUsSection />
+            {/* <ContactUsSection /> */}
         </main>
     );
 }

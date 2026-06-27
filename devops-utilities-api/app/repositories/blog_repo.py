@@ -43,47 +43,7 @@ def list_feature(
     blogs = query.limit(limit).all()
 
     return blogs
-
-# def list_feature(
-#     db: Session, 
-#     limit: int, 
-#     search: Optional[str] = None, 
-#     type: Optional[str] = None
-# ) -> tuple[list[Blog], int]:
-     
-#     query = db.query(Blog)  
-#     if search: 
-#         query = query.filter(
-#             Blog.blog_title.ilike(f"%{search}%")
-#         )
-
-  
-    # blogs = (
-    #     query.options(
-    #         load_only(
-    #             Blog.blog_id, 
-    #             Blog.blog_img_url, 
-    #             Blog.blog_title,
-    #             Blog.blog_slug, 
-    #             Blog.blog_excerpt,
-    #             Blog.blog_content,
-    #             Blog.blog_published_at,
-    #             Blog.blog_meta_title, 
-    #             Blog.blog_meta_keywords,
-    #             Blog.blog_meta_desc, 
-    #             Blog.blog_author,
-    #         ),
-    #         joinedload(Blog.category).load_only(
-    #             BlogCategory.blog_cat_id,
-    #             BlogCategory.blog_cat_name,
-    #         )
-    #     )
-    #     .order_by(Blog.blog_id.asc())  
-    #     .limit(limit)
-    #     .all() 
-    # )
-    
-#     return blogs
+ 
 
 def list_all(
     db: Session,
@@ -215,22 +175,10 @@ def get_by_slug(db: Session, url: str) -> Blog | None:
 def get_by_title(db: Session, title: str) -> Blog | None:
     return db.query(Blog).filter(Blog.blog_title == title).first()
 
-# def create(db: Session, payload: BlogCreate) -> Blog: 
-#     tag_ids = payload.tags 
-#     blog_data = payload.model_dump(exclude={"tags"}) 
-#     blog = Blog(**blog_data)
-#     db.add(blog)
-#     db.flush()    
-#     for tag_id in tag_ids:
-#         mapping = BlogTagMapping(blog_id=blog.blog_id, blog_tag_id=tag_id)
-#         db.add(mapping) 
-#     db.commit()
-#     db.refresh(blog)
-#     return blog
+def get_by_id(db: Session, id: int) -> Blog | None:
+    return db.query(Blog).filter(Blog.blog_id == id).first()
 
-
-
-
+ 
 def create(db: Session, payload: BlogCreate) -> Blog:
     tag_ids = payload.tags
     references = payload.references
@@ -269,18 +217,56 @@ def update(db: Session, blog_id: int, payload: BlogUpdate) -> Blog:
     if not blog:
         raise HTTPException(status_code=404, detail="Blog not found")
 
-    tag_ids = payload.tags
-    blog_data = payload.model_dump(exclude={"tags"}, exclude_unset=True) 
-    for key, val in blog_data.items():
-        setattr(blog, key, val) 
-    db.query(BlogTagMapping).filter(BlogTagMapping.blog_id == blog_id).delete()
-    for tag_id in tag_ids:
-        mapping = BlogTagMapping(blog_id=blog_id, blog_tag_id=tag_id)
-        db.add(mapping)
+    tag_ids   = payload.tags
+    references = payload.references
 
-    db.commit()
-    db.refresh(blog)
-    return blog
+    blog_data = payload.model_dump(exclude={"tags", "references"}, exclude_unset=True)
+
+    for key, val in blog_data.items():
+        setattr(blog, key, val)
+
+    try: 
+        db.query(BlogTagMapping).filter(BlogTagMapping.blog_id == blog_id).delete()
+        if tag_ids:
+            db.add_all([
+                BlogTagMapping(blog_id=blog_id, blog_tag_id=tag_id)
+                for tag_id in tag_ids
+            ]) 
+        db.query(BlogRefMapping).filter(BlogRefMapping.blog_id == blog_id).delete()
+        if references:
+            db.add_all([
+                BlogRefMapping(
+                    blog_id=blog_id,
+                    ref_title=ref.ref_title,
+                    ref_url=ref.ref_url,
+                )
+                for ref in references
+            ])
+
+        db.commit()
+        db.refresh(blog)
+        return blog
+
+    except Exception:
+        db.rollback()
+        raise
+# def update(db: Session, blog_id: int, payload: BlogUpdate) -> Blog:
+#     blog = db.query(Blog).filter(Blog.blog_id == blog_id).first()
+#     if not blog:
+#         raise HTTPException(status_code=404, detail="Blog not found")
+
+#     tag_ids = payload.tags
+#     blog_data = payload.model_dump(exclude={"tags"}, exclude_unset=True) 
+#     for key, val in blog_data.items():
+#         setattr(blog, key, val) 
+#     db.query(BlogTagMapping).filter(BlogTagMapping.blog_id == blog_id).delete()
+#     for tag_id in tag_ids:
+#         mapping = BlogTagMapping(blog_id=blog_id, blog_tag_id=tag_id)
+#         db.add(mapping)
+
+#     db.commit()
+#     db.refresh(blog)
+#     return blog
 
 def list_all_cat(
     db: Session, 

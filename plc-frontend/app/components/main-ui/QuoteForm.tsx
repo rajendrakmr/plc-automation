@@ -14,6 +14,7 @@ interface FormData {
   phone: string;
   email: string;
   message: string;
+  company: string;
 }
 
 export default function QuoteForm({ product }: QuoteFormProps) {
@@ -22,6 +23,7 @@ export default function QuoteForm({ product }: QuoteFormProps) {
     phone: "",
     email: "",
     message: "",
+    company: "",
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -50,7 +52,7 @@ export default function QuoteForm({ product }: QuoteFormProps) {
           manufacturer: product.category.cat_name,
           quantity: 1,
           customer_name: formData.name,
-          company_name: "",
+          company_name: formData.company,
           email_address: formData.email,
           telephone: formData.phone,
           content: formData.message,
@@ -64,7 +66,7 @@ export default function QuoteForm({ product }: QuoteFormProps) {
       }
 
       setSuccess(true);
-      setFormData({ name: "", phone: "", email: "", message: "" });
+      setFormData({ name: "", phone: "", email: "", message: "",company: "" });
 
     } catch (err: any) {
       setError(err.message || "Failed to submit. Please try again.");
@@ -91,6 +93,16 @@ export default function QuoteForm({ product }: QuoteFormProps) {
               name="name"
               placeholder="Full Name *"
               value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+           <div className="form-group">
+            <input
+              type="text"
+              name="company"
+              placeholder="Company Name *"
+              value={formData.company}
               onChange={handleChange}
               required
             />

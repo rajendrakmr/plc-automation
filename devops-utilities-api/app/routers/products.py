@@ -1,20 +1,23 @@
-from fastapi import APIRouter, Depends, UploadFile, File, Query
+from fastapi import APIRouter, Depends, UploadFile, File, Query,status
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.core.database import get_db
 from app.core.dependencies import get_current_user
 from app.models.users import User
 from app.schemas.products import ProductCreate, ProductUpdate, ProductResponse
+from app.schemas.category import CategoryCreate,CategoryUpdate,CategoryResponse
 # from app.services.product_service import get_products as fetch_products,import_products_csv
 from app.services.product_service import (
     create_product,
     update_product,
     delete_product,
     fetch_products,
-    fetch_all
+    fetch_all,
+    
     # get_products,
     # get_product,
 )
+from app.services import cat_services
 router = APIRouter(prefix="/products", tags=["Products"])
 
 
@@ -138,3 +141,44 @@ def product_list(
 
 
  
+ 
+ 
+ 
+
+# Blogs categorys & tags
+
+@router.get("/category")
+def get_category(
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100), 
+    search: Optional[str] = None,  
+    status: Optional[int] = None , 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+): 
+    return cat_services.category( db,page,limit,search,status)
+ 
+ 
+@router.post("/category", response_model=CategoryResponse)
+def create_category( 
+    payload: CategoryCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return cat_services.create(db, payload)
+
+
+@router.patch("/category/{category_id}", response_model=CategoryResponse)
+def update_category(
+    category_id: int,
+    payload: CategoryUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return cat_services.delete_category(db, category_id)
+
+ 
+@router.delete("/category/{category_id}", status_code=status.HTTP_200_OK)
+def delete_category(category_id: int, db: Session = Depends(get_db)):
+    cat_services.delete_category(db, category_id)
+    return {"success": True, "message": "Category deleted successfully"}

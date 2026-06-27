@@ -49,12 +49,21 @@ export interface Product {
     product_type: ProductType;
 }
 
-interface Categories {
+// interface Categories {
+//     category_id: number;
+//     cat_name: string;
+//     cat_slug: string;
+// }
+export interface Categories {
     category_id: number;
     cat_name: string;
+    cat_desc: string;
+    image_url: string;
     cat_slug: string;
+    meta_title: string;
+    meta_keywords: string;
+    meta_description: string;
 }
-
 function useDebounce<T>(value: T, delay = 400): T {
     const [debounced, setDebounced] = useState(value);
     useEffect(() => {
@@ -67,14 +76,14 @@ function useDebounce<T>(value: T, delay = 400): T {
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
 type BrandsDetailProps = {
-    cat_id: number;
+     categories: Categories | null;
 };
 
-const BrandDetailProduct: React.FC<BrandsDetailProps> = ({ cat_id }) => {
+const BrandDetailProduct: React.FC<BrandsDetailProps> = ({ categories }) => {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(12);
     const [searchInput, setSearchInput] = useState("");
-    const [category_id, setCategoryId] = useState(cat_id);
+    const [category_id, setCategoryId] = useState(categories?.category_id || null);
     const [activeLetter, setActiveLetter] = useState("A");
 
     const debouncedSearch = useDebounce(searchInput, 400);
@@ -82,12 +91,12 @@ const BrandDetailProduct: React.FC<BrandsDetailProps> = ({ cat_id }) => {
         setPage(1);
     }, [debouncedSearch]);
 
-    const { data: categories, loading: catLoading } = useFetchData<Categories[]>({
-        url: '/categories/list',
-        params: {
-            search: activeLetter,
-        }
-    });
+    // const { data: categories, loading: catLoading } = useFetchData<Categories[]>({
+    //     url: '/categories/list',
+    //     params: {
+    //         search: activeLetter,
+    //     }
+    // });
 
 
     const { loading, data, total, totalPages, isSearchLoading } =
@@ -106,12 +115,9 @@ const BrandDetailProduct: React.FC<BrandsDetailProps> = ({ cat_id }) => {
 
     return (
         <>
-
             <section className="section_grey_content">
                 <div className="section_container product-container">
                     <div className="product-list">
-
-                        {/* TOPBAR */}
                         <div className="product-topbar">
                             <div className="prd-search-box">
                                 <input
@@ -205,6 +211,13 @@ const BrandDetailProduct: React.FC<BrandsDetailProps> = ({ cat_id }) => {
                             </div>
                         )}
                     </div>
+
+                    {
+                        categories?.cat_desc && <div
+                            className="product_desc"
+                            dangerouslySetInnerHTML={{ __html: categories.cat_desc }}
+                        />
+                    }
                 </div>
             </section>
         </>

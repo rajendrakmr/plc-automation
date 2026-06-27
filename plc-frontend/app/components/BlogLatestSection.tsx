@@ -28,18 +28,15 @@ export default function BlogLatestSection() {
     url: '/blogs/feature',
     params: {
       limit: 3,
-      type: "mega"
+      type: "latest"
     },
 
   });
 
   return (
-    <section className={styles.rkb_section}>
-      <div className={styles.rkb_container}>
-
-        {/* Header */}
-        <div className={styles.rkb_header}>
-          <span className={styles.rkb_eyebrow}>From Our Blog</span>
+    <section className={'section_grey_content '}>
+      <div className={"section_container"}> 
+        <div className={styles.rkb_header}> 
           <h2 className={styles.rkb_heading}>Latest Insights & Updates</h2>
           <p className={styles.rkb_subtext}>
             Stay ahead with expert articles on PLC automation, industrial
@@ -75,9 +72,7 @@ export default function BlogLatestSection() {
               </div>
             </Link>
           ))}
-        </div>
-
-        {/* CTA */}
+        </div> 
         <div className={styles.rkb_cta}>
           <Link href="/blogs" className={styles.rkb_ctaBtn}>
             View All Articles

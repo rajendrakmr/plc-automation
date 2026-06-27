@@ -1,54 +1,156 @@
 'use client';
-
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
+import { useState } from 'react';
 import {
   LayoutDashboard,
   Package,
-  ShoppingCart,
-  Users,
-  Factory,
   FileText,
-  BarChart3,
-  Settings,
+  ChevronDown,
+  PlusCircle,
+  List,
+  Image as ImageIcon,
+  HelpCircle,
+  Home,
+  Star,
+  BookOpen,
+  Phone,
 } from 'lucide-react';
-const menuSections = [
+
+import "./sidemenu.css";
+
+interface SubItem {
+  label: string;
+  href: string;
+}
+
+interface MenuItem {
+  label: string;
+  href?: string;
+  icon: React.ElementType;
+  badge?: number;
+  children?: SubItem[];
+}
+
+interface MenuSection {
+  title: string;
+  items: MenuItem[];
+}
+
+const menuSections: MenuSection[] = [
   {
-    title: "General",
+    title: "Navigation",
     items: [
       { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-      { label: "Enquiries", href: "/admin/enquiries", badge: 12, icon: FileText },
-      // { label: "Orders", href: "/admin/orders", badge: 5, icon: ShoppingCart },
+      // { label: "Home Management", href: "/admin/home", icon: Home },
+      // { label: "Banner Management", href: "/admin/banners", icon: ImageIcon },
+      // {
+      //   label: "Category Management",
+      //   icon: List,
+      //   children: [
+      //     { label: "Add New Category", href: "/admin/categories/add" },
+      //     { label: "Category Management", href: "/admin/categories" },
+      //   ],
+      // },
+      {
+        label: "Enquiries",
+        href: "/admin/enquiries",
+        icon: FileText, 
+      },
+      {
+        label: "Product Management",
+        icon: Package,
+        children: [
+          { label: "Add New Product", href: "/admin/products/add" },
+          { label: "Product Management", href: "/admin/products" },
+          { label: "Category", href: "/admin/products/category" },
+          { label: "Feature", href: "/admin/products/feature" },
+        ],
+      },
+      // { label: "Gallery Management", href: "/admin/gallery", icon: ImageIcon },
+      {
+        label: "Blog Management",
+        icon: BookOpen,
+        children: [
+          { label: "Add New Blog", href: "/admin/blogs/add" },
+          { label: "Blog Management", href: "/admin/blogs" },
+          { label: "Category", href: "/admin/blogs/category" },
+          { label: "Tag", href: "/admin/blogs/tag" },
+          { label: "Feature", href: "/admin/blogs/feature" },
+        ],
+      },
+      // { label: "Faq's Management", href: "/admin/faqs", icon: HelpCircle },
+      // { label: "Contact Management", href: "/admin/contacts", icon: Phone },
+      
     ],
   },
-  {
-    title: "Catalogue",
-    items: [
-      { label: "Products", href: "/admin/products", icon: Package },
-      // { label: "Brands", href: "/admin/brands", icon: Factory },
-    ],
-  },
-  {
-    title: "Content",
-    items: [
-      { label: "Blog / Pages", href: "/admin/blogs", icon: FileText },
-      // { label: "Offers & Deals", href: "/admin/offers", icon: BarChart3 },
-    ],
-  },
-  // {
-  //   title: "System",
-  //   items: [
-  //     { label: "Users & Roles", href: "/admin/users", icon: Users },
-  //     { label: "Import Logs", href: "/admin/import-logs", icon: Settings },
-  //     { label: "Settings", href: "/admin/settings", icon: Settings },
-  //   ],
-  // },
 ];
 
-export default function AdminSidebar() {
+// ─── Single nav item (with optional submenu) ──────────────────────────────────
+function NavItem({ item }: { item: MenuItem }) {
   const pathname = usePathname();
 
+  const isChildActive = item.children?.some((c) => pathname === c.href) ?? false;
+  const [open, setOpen] = useState(isChildActive);
+
+  const hasChildren = !!item.children?.length;
+  const isActive = item.href ? pathname === item.href : isChildActive;
+  const Icon = item.icon;
+
+  if (hasChildren) {
+    return (
+      <div className={`asb-group ${open ? 'asb-group--open' : ''}`}>
+        <button
+          className={`asb-nav-link asb-nav-link--parent ${isChildActive ? 'active' : ''}`}
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+        >
+          <Icon size={17} className="asb-nav-icon" />
+          <span className="asb-nav-label">{item.label}</span>
+          <ChevronDown
+            size={15}
+            className={`asb-chevron ${open ? 'asb-chevron--open' : ''}`}
+          />
+        </button>
+
+        {open && (
+          <div className="asb-submenu">
+            {item.children!.map((child) => {
+              const childActive = pathname === child.href;
+              return (
+                <Link
+                  key={child.href}
+                  href={child.href}
+                  className={`asb-sub-link ${childActive ? 'active' : ''}`}
+                >
+                  <span className="asb-sub-dot" />
+                  {child.label}
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      href={item.href!}
+      className={`asb-nav-link ${isActive ? 'active' : ''}`}
+    >
+      <Icon size={17} className="asb-nav-icon" />
+      <span className="asb-nav-label">{item.label}</span>
+      {item.badge && (
+        <span className="asb-badge">{item.badge}</span>
+      )}
+    </Link>
+  );
+}
+
+// ─── Sidebar ──────────────────────────────────────────────────────────────────
+export default function AdminSidebar() {
   return (
     <div className="admin-sidebar">
       <Link className="admin-logo" href="/">
@@ -57,6 +159,7 @@ export default function AdminSidebar() {
           alt="PLC Automation"
           width={300}
           height={70}
+          style={{ width: '100%', height: 'auto' }}
         />
       </Link>
 
@@ -64,29 +167,9 @@ export default function AdminSidebar() {
         {menuSections.map((section, i) => (
           <div key={i}>
             <div className="admin-nav-section">{section.title}</div>
-
-            {section.items.map((item, idx) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
-
-              return (
-                <Link
-                  key={idx}
-                  href={item.href}
-                  className={`admin-nav-link ${isActive ? 'active' : ''}`}
-                >
-                  <Icon size={18} />
-
-                  <span>{item.label}</span>
-
-                  {item.badge && (
-                    <span className="admin-nav-badge">
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
+            {section.items.map((item, idx) => (
+              <NavItem key={idx} item={item} />
+            ))}
           </div>
         ))}
       </nav>

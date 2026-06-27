@@ -71,12 +71,7 @@ interface ProductPayload
   extends Omit<ProductForm, "meta" | "featuredImage"> {
   meta: MetaPayload[];
 }
-const DEFAULT_META: MetaField[] = [
-  { id: "1", meta_key: "Brand", meta_title: "Brand Name", meta_desc: "" },
-  { id: "2", meta_key: "Series", meta_title: "PLC Series", meta_desc: "" },
-  { id: "3", meta_key: "Voltage", meta_title: "Operating Voltage", meta_desc: "" },
-  { id: "4", meta_key: "Communication", meta_title: "Communication Port", meta_desc: "" },
-];
+const DEFAULT_META: MetaField[] = [];
 const STOCK: StockField[] = [
   { value: "in-stock", label: "In Stock" },
   { value: "limited", label: "Limited" },
@@ -87,14 +82,14 @@ const STOCK: StockField[] = [
 const EMPTY_FORM: ProductForm = {
   category_id: "",
   product_type_id: "",
-  part_no: "6ES7214-1AG40-0XB0",
-  url: "siemens-s7-1200-cpu-1214c",
-  short_desc: "Siemens update S7-1200 PLC CPU",
-  product_desc: "Compact PLC controller suitable for industrial automation.",
+  part_no: "",
+  url: "",
+  short_desc: "",
+  product_desc: "",
   image_url: "",
-  meta_title: "Siemens S7-1200 CPU 1214C",
-  meta_keywords: "siemens plc,s7-1200,cpu1214c",
-  meta_description: "Buy Siemens S7-1200 CPU 1214C online.",
+  meta_title: "",
+  meta_keywords: "",
+  meta_description: "",
   stock: "in-stock",
   status: "published",
   meta: DEFAULT_META,

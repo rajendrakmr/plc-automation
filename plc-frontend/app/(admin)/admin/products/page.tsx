@@ -3,6 +3,7 @@
 import { useFetch, PaginatedResponse } from "@/app/components/hooks/useFetch";
 import { useGet } from "@/app/components/hooks/useGet";
 import ButtonLoader from "@/app/components/main-ui/ButtonLoader";
+import { truncate } from "@/app/utils/helper";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
@@ -98,11 +99,19 @@ export default function ProductsPage() {
     [filters]
   );
 
-  const pageNumbers = useMemo(() => {
-    const start = Math.max(1, page - 2);
-    const end = Math.min(totalPages, start + 4);
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
-  }, [page, totalPages]);
+ const pageNumbers = (() => {
+    const pages: (number | "…")[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (page > 3) pages.push("…");
+      for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) pages.push(i);
+      if (page < totalPages - 2) pages.push("…");
+      pages.push(totalPages);
+    }
+    return pages;
+  })();
 
   const allSelected =
     products.length > 0 && products.every((p) => selected.has(p.part_no));
@@ -288,9 +297,9 @@ export default function ProductsPage() {
             <table>
               <thead>
                 <tr>
-                  <th className="col-check no-sort">
+                  {/* <th className="col-check no-sort">
                     <input type="checkbox" checked={allSelected} onChange={(e) => handleSelectAll(e.target.checked)} aria-label="Select all" />
-                  </th>
+                  </th> */}
                   <th className="col-part" onClick={() => handleSort("part_no")}>
                     Part No <SortIcon active={sortKey === "part_no"} dir={sortDir} />
                   </th>
@@ -300,9 +309,9 @@ export default function ProductsPage() {
                   <th className="col-cat" onClick={() => handleSort("category")}>
                     Category <SortIcon active={sortKey === "category"} dir={sortDir} />
                   </th>
-                  <th onClick={() => handleSort("short_desc")}>
+                  {/* <th onClick={() => handleSort("short_desc")}>
                     Description <SortIcon active={sortKey === "short_desc"} dir={sortDir} />
-                  </th>
+                  </th> */}
                   <th className="col-stock" onClick={() => handleSort("stock")}>
                     Stock <SortIcon active={sortKey === "stock"} dir={sortDir} />
                   </th>
@@ -322,18 +331,18 @@ export default function ProductsPage() {
                 ) : (
                   products.map((product) => (
                     <tr key={product.part_no} className={selected.has(product.part_no) ? "row-selected" : ""}>
-                      <td className="col-check">
+                      {/* <td className="col-check">
                         <input
                           type="checkbox"
                           checked={selected.has(product.part_no)}
                           onChange={(e) => handleSelectRow(product.part_no, e.target.checked)}
                           aria-label={`Select ${product.part_no}`}
                         />
-                      </td>
+                      </td> */}
                       <td className="col-part"><span className="part-no">{product.part_no}</span></td>
                       <td className="col-type"><span className="type-pill">{product.product_type.name}</span></td>
                       <td className="col-cat">{product.category.cat_name}</td>
-                      <td title={product.short_desc}>{product.short_desc}</td>
+                      {/* <td title={product.short_desc}>{truncate(product.short_desc)}</td> */}
                       <td className="col-stock"><StockBadge stock={product.stock} /></td>
                       <td className="col-actions">
                         <button className="action-btn" title="Edit" aria-label={`Edit ${product.part_no}`} onClick={() => handleRowEditAction(product)}>✏️</button>
@@ -360,7 +369,7 @@ export default function ProductsPage() {
             <div className="pagination">
               <button className="pg-btn" disabled={page <= 1} onClick={() => setPage((p) => p - 1)} aria-label="Previous page">‹</button>
               {pageNumbers.map((n) => (
-                <button key={n} className={`pg-btn ${n === page ? "pg-active" : ""}`} onClick={() => setPage(n)} aria-current={n === page ? "page" : undefined}>{n}</button>
+                <button key={n} className={`pg-btn ${n === page ? "pg-active" : ""}`} onClick={() => setPage(n as number)} aria-current={n === page ? "page" : undefined}>{n}</button>
               ))}
               <button className="pg-btn" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} aria-label="Next page">›</button>
             </div>

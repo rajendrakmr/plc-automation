@@ -18,19 +18,23 @@ export default function ContactUsSection() {
             href="tel:+61421000214"
             className="rk_cta_box rk_cta_box_link"
           >
-            <div className="rk_cta_icon"> 
-                <Image
-                  src="/assets/Icons/phone-plcautomationgroup.png"
-                  alt="Phone Icon"
-                  width={40}
-                  height={40}
-                />
-              </div>
-            
+            <div className="rk_cta_icon">
+              <Image
+                src="/assets/Icons/phone-plcautomationgroup.png"
+                alt="Phone Icon"
+                width={40}
+                height={40}
+              />
+            </div>
+
 
             <h3>Call Us</h3>
-
-            <p>AU: +61 421 000 214</p>
+            <p>
+              AU:{" "}
+              <Link href="tel:+61421000 214" className="contact-link">
+                +61 421 000 214
+              </Link>
+            </p> 
           </a>
 
           {/* Enquiry Form */}
@@ -40,15 +44,14 @@ export default function ContactUsSection() {
           >
             <div className="rk_cta_icon">
               <Image
-                  src="/assets/Icons/chat-line-plcautomationgroup.png"
-                  alt="Email Icon"
-                  width={40}
-                  height={40}
-                />
+                src="/assets/Icons/chat-line-plcautomationgroup.png"
+                alt="Email Icon"
+                width={40}
+                height={40}
+              />
             </div>
 
-            <h3>Enquire Now</h3>
-
+            <h3>Enquire Now</h3> 
             <p>Complete our online form</p>
           </Link>
 
@@ -59,16 +62,21 @@ export default function ContactUsSection() {
           >
             <div className="rk_cta_icon">
               <Image
-                  src="/assets/Icons/phone-plcautomationgroup.png"
-                  alt="Email Icon"
-                  width={40}
-                  height={40}
-                />
+                src="/assets/Icons/phone-plcautomationgroup.png"
+                alt="Email Icon"
+                width={40}
+                height={40}
+              />
             </div>
 
             <h3>Call Us</h3>
 
-            <p>USA: +65 6980 8259</p>
+            <p>
+              SG:{" "}
+              <Link href="tel:+6589507034" className="contact-link">
+                +65 8950 7034
+              </Link>
+            </p>
           </a>
 
           {/* Email */}
@@ -78,16 +86,20 @@ export default function ContactUsSection() {
           >
             <div className="rk_cta_icon">
               <Image
-                  src="/assets/Icons/email-plcautomationgroup.png"
-                  alt="Email Icon"
-                  width={40}
-                  height={40}
-                />
+                src="/assets/Icons/email-plcautomationgroup.png"
+                alt="Email Icon"
+                width={40}
+                height={40}
+              />
             </div>
 
             <h3>Email Us</h3>
 
-            <p>sales@plcautomat.com</p>
+             <p> 
+              <Link href="mailto:sales@plcautomat.com" className="contact-link">
+                sales@plcautomat.com
+              </Link>
+            </p> 
           </a>
 
         </div>

@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field, field_validator
 class CategoryCreate(BaseModel):
     cat_name: str = Field(..., min_length=2, max_length=255)
     cat_slug: str = Field(..., min_length=2, max_length=255) 
+    cat_short_text:Optional[str] = None 
     cat_desc: Optional[str] = None 
     meta_title: Optional[str] = None
     meta_keywords: Optional[str] = None
@@ -64,10 +65,11 @@ class CateResp(BaseModel):
     cat_name: str
     cat_slug: str
     cat_desc: str 
-    image_url: str
+    # image_url: str
     meta_title:str
     meta_keywords:str
     meta_description:str
+    cat_short_text:str
     class Config:
         from_attributes = True
 

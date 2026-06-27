@@ -1,19 +1,34 @@
 // components/ui/FeaturedImageUploader.tsx
-
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface FeaturedImageUploaderProps {
   value: File | null;
+  image_url?: string | null;
   onChange: (file: File | null) => void;
 }
 
 export default function FeaturedImageUploader({
   value,
+  image_url,
   onChange,
 }: FeaturedImageUploaderProps) {
-  const [dragging, setDragging] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [dragging, setDragging]   = useState(false);
+  const [preview, setPreview]     = useState<string | null>(null);
+  const fileRef                   = useRef<HTMLInputElement>(null);
+
+  // Edit ke time pe image_url se preview set karo
+  useEffect(() => {
+    if (image_url && !value) {
+      setPreview(`${process.env.NEXT_PUBLIC_APP_URL}${image_url}`);
+    }
+  }, [image_url]);
+
+  // value null ho jaye (remove) toh preview clear karo
+  useEffect(() => {
+    if (!value && !image_url) {
+      setPreview(null);
+    }
+  }, [value]);
 
   const handleFile = (file: File) => {
     onChange(file);
@@ -25,6 +40,7 @@ export default function FeaturedImageUploader({
   const handleRemove = () => {
     onChange(null);
     setPreview(null);
+    if (fileRef.current) fileRef.current.value = "";
   };
 
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -36,7 +52,7 @@ export default function FeaturedImageUploader({
 
   return (
     <div>
-      {/* Card Header with Remove button */}
+      {/* Card Header */}
       <div
         style={{
           padding: "14px 20px",
@@ -45,18 +61,7 @@ export default function FeaturedImageUploader({
           alignItems: "center",
           justifyContent: "space-between",
         }}
-      >
-        <span
-          style={{
-            fontSize: "13px",
-            fontWeight: 700,
-            letterSpacing: "0.07em",
-            textTransform: "uppercase",
-            color: "black",
-          }}
-        >
-          Featured Image
-        </span>
+      > 
         {preview && (
           <button
             onClick={handleRemove}
@@ -112,7 +117,6 @@ export default function FeaturedImageUploader({
             </div>
           </div>
         )}
-
         <input
           ref={fileRef}
           type="file"

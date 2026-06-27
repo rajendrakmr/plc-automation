@@ -1,12 +1,17 @@
-
-import FeatureHighlightsBar from "@/app/components/FeatureHighlightsBar";
-import SplitContentSection from "@/app/components/sections/about/SplitContentSection";
-import AboutHeroSection from "@/app/components/sections/AboutHeroSection";
-import BreadCrumb from "@/app/components/sections/BreadCrumb";
-import ContactUsSection from "@/app/components/ContactUsSection";
-import PartnerSlider from "@/app/components/sections/common/PartnerSlider";
-import TeamSliderSection from "@/app/components/main-ui/TeamSliderSection";
-import Image from "next/image";
+ 
+ 
+import HeroSection from "@/app/components/About/HeroSection";
+import IntroSection from "@/app/components/About/IntroSection";
+import StatsSection from "@/app/components/About/StatsSection";
+import TimelineSection from "@/app/components/About/TimelineSection";
+import WhyChooseUsSection from "@/app/components/About/WhyChooseUsSection";
+import IndustriesSection from "@/app/components/About/IndustriesSection";
+import BrandsSection from "@/app/components/About/BrandsSection";
+import TeamSection from "@/app/components/About/TeamSection";
+import VisionMissionSection from "@/app/components/About/VisionMissionSection";
+import GlobalReachSection from "@/app/components/About/GlobalReachSection";
+import CTASection from "@/app/components/About/CTASection";
+import "@/app/css/about-us.css";
 
 export const metadata = {
   title: "About PLC Automation Group - Innovating Industrial Solutions",
@@ -15,29 +20,19 @@ export const metadata = {
 };
 
 export default function AboutUs() {
-  const items = [
-    {
-      icon: "/assets/Icons/calendar-plcautomationgroup.png",
-      title: "12-month warranty",
-    },
-    {
-      icon: "/assets/Icons/delivery-plcautomationgroup.png",
-      title: "Immediate dispatch",
-    },
-    {
-      icon: "/assets/Icons/globus-plcautomationgroup.png",
-      title: "Global delivery",
-    },
-  ];
   return (
-    <main>
-      <FeatureHighlightsBar />
-
-      <AboutHeroSection />
-      <SplitContentSection />
-      <TeamSliderSection />
-
-      <ContactUsSection />
+    <main className="about-page">
+      <HeroSection />
+      <IntroSection />
+      <StatsSection />
+      <TimelineSection />
+      <WhyChooseUsSection />
+      <IndustriesSection />
+      <BrandsSection />
+      <TeamSection />
+      <VisionMissionSection />
+      <GlobalReachSection />
+      <CTASection />
     </main>
   );
 }

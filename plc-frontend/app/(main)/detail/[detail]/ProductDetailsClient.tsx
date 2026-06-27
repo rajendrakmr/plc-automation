@@ -20,6 +20,23 @@ type Props = {
     product: Product;
 };
 
+
+
+const stockConfig = {
+    "in-stock": {
+        label: "In Stock",
+        className: "badge-stock badge-in success",
+    },
+    "limited": {
+        label: "Limited",
+        className: "badge-stock badge-low warning",
+    },
+    "out-stock": {
+        label: "Back Order",
+        className: "badge-stock badge-out error",
+    }
+};
+
 export default function ProductDetailsClient({
     product,
 }: Props) {
@@ -69,6 +86,9 @@ export default function ProductDetailsClient({
             el.scrollIntoView({ behavior: "smooth", block: "start", });
         }
     };
+
+    const stock = product.stock ?? "In Stock";
+    const { label, className } = stockConfig[stock];
     return (
         <main>
 
@@ -103,8 +123,8 @@ export default function ProductDetailsClient({
                     <div className="pd-left">
                         <h1 className="pd-code">
                             {product.part_no}
-                        </h1> 
-                         {
+                        </h1>
+                        {
                             product.short_desc && <p
                                 className="pd-title"
                                 dangerouslySetInnerHTML={{ __html: product.short_desc }}
@@ -159,7 +179,9 @@ export default function ProductDetailsClient({
 
                                 <tr>
                                     <td>Status</td>
-                                    <td>{product.stock}</td>
+                                    <td><span className={className}>
+                                        {label}
+                                    </span></td>
                                 </tr>
                             </tbody>
                         </table>

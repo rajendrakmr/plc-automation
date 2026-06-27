@@ -77,6 +77,16 @@ export function usePost<
         const responseData = await res
           .json()
           .catch(() => ({}));
+        if (res.status === 422) {
+          onErrors?.(
+            responseData?.detail?.errors ||
+            responseData?.errors ||
+            {}
+          );
+
+          return null;
+        }
+
 
         if (res.status === 409) {
           onErrors?.(

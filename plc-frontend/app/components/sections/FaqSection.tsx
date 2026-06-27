@@ -11,14 +11,11 @@ type Category = keyof typeof faqByCategory;
 export default function FaqSection() {
     const [activeTab, setActiveTab] = useState<Category>("Ordering");
     const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-    // ✅ Memoized categories
+ 
     const categories = useMemo(
         () => Object.keys(faqByCategory) as Category[],
         []
-    );
-
-    // ✅ Memoized active FAQ list
+    ); 
     const activeFaqs = useMemo(
         () => faqByCategory[activeTab],
         [activeTab]
@@ -44,21 +41,21 @@ export default function FaqSection() {
                         Find quick answers to common questions about ordering, shipping, and product authenticity.
                     </p>
                     <div className="faq-contact-cards">
-                        <a href="tel:+65 6980 8259" className="faq-contact-card">
+                        <a href="/contact-us" className="faq-contact-card">
                             <div className="">
                                 <Image
-                                    src="/assets/Icons/phone-plcautomationgroup.png"
-                                    alt="Phone Icon"
+                                    src="/assets/Icons/chat-line-plcautomationgroup.png"
+                                    alt="Chat Icon"
                                     width={40}
                                     height={40}
                                 />
                             </div>
                             <div className="fcc-text">
                                 <strong>
-                                    USA: Call Us
+                                     Enquire Now 
                                 </strong>
                                 <span>
-                                    +65 6980 8259
+                                    Complete our online form
                                 </span>
                             </div>
                         </a>
@@ -91,7 +88,7 @@ export default function FaqSection() {
                             </div>
                             <div className="fcc-text">
                                 <strong>
-                                    AU: Call Us
+                                  Chat with us 
                                 </strong>
                                 <span>
                                     +61 421 000 214
